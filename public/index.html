@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADZ TempMail — adzstore.my.id</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner"><a class="brand" href="/"><span class="logo">A</span><span id="brandName">ADZ TempMail</span></a><div class="nav-links"><a href="#app">Dashboard</a><a href="#pricing">Harga</a><a href="/admin.html">Admin</a></div><button class="btn primary small" onclick="createMailbox()">Buat email</button></div></nav>
+  <header class="hero container">
+    <div id="adHeader" class="ad-slot hide"></div>
+    <div class="badge"><span class="dot"></span><span>Domain temporary: <b>adzstore.my.id</b></span></div>
+    <h1 id="heroTitle">Email sementara gratis 24 jam.</h1>
+    <p id="heroSubtitle">Buat inbox temporary dengan domain adzstore.my.id, terima email, kirim email, dan upgrade unlimited lewat balance.</p>
+    <div class="hero-actions"><button class="btn primary" onclick="createMailbox()">Generate email gratis</button><button class="btn" onclick="simulateInbound()">Simulasi email masuk</button></div>
+  </header>
+  <main class="container">
+    <section id="app" class="app-shell"><div class="app-top"><div class="window-dots"><i></i><i></i><i></i></div><div class="mono">fullstack / express api / json db</div></div><div class="dashboard">
+      <aside class="sidebar">
+        <div id="adSidebar" class="ad-slot hide"></div>
+        <div class="panel"><div class="label"><span>Email aktif</span><span id="planBadge">-</span></div><div id="address" class="address-box">Klik generate email</div><div class="actions-row"><button class="btn small" onclick="copyAddress()">Copy</button><button class="btn small green" onclick="createMailbox()">Refresh baru</button></div></div>
+        <div class="panel"><div class="label"><span>Sisa waktu</span><span id="timer" class="timer">--:--:--</span></div><p class="muted">Plan free aktif sesuai setting admin. Upgrade unlimited agar email permanen.</p><button class="btn orange full" onclick="upgradeMailbox()">Upgrade unlimited</button></div>
+        <div class="panel balance"><div><div class="label"><span>Balance</span></div><strong id="balance">Rp 0</strong></div><button class="btn small primary" onclick="topupMailbox()">Topup demo</button></div>
+        <div class="panel"><div class="label"><span>Endpoint inbound</span><span>API</span></div><p class="muted">POST /api/inbound menerima email dari mail server/webhook ke alamat @adzstore.my.id.</p></div>
+      </aside>
+      <section class="main"><div class="tabs"><button id="tabInbox" class="tab active" onclick="showTab('inbox')">Inbox</button><button id="tabCompose" class="tab" onclick="showTab('compose')">Kirim email</button><button id="tabSent" class="tab" onclick="showTab('sent')">Sent</button></div>
+        <div id="inboxView"><div id="mailList" class="mail-list"></div><article id="reader" class="reader"><h3>Belum ada email dipilih</h3><p>Buat email dulu, lalu pakai simulasi inbound atau POST /api/inbound.</p></article></div>
+        <div id="composeView" class="hide"><div class="panel compose-grid"><label class="field"><span>Dari</span><input id="fromField" readonly></label><label class="field"><span>Ke</span><input id="toField" placeholder="target@example.com"></label><label class="field"><span>Subject</span><input id="subjectField" placeholder="Judul email"></label><label class="field"><span>Pesan</span><textarea id="bodyField" placeholder="Isi pesan..."></textarea></label><button class="btn primary" onclick="sendEmail()">Kirim</button></div></div>
+        <div id="sentView" class="hide"><div id="sentList" class="mail-list"></div></div>
+      </section>
+    </div></section>
+    <section id="pricing"><h2 class="section-title">Free 24 jam, unlimited via balance.</h2><div class="pricing-grid"><div class="price-card"><h3>Free</h3><div class="price">Rp 0 <small>/ email</small></div><p class="muted">Generate alamat @adzstore.my.id, inbox, kirim email, expired otomatis.</p></div><div class="price-card hot"><h3>Unlimited</h3><div class="price" id="priceText">Rp 25.000</div><p class="muted">Bayar dari balance untuk alamat permanen tanpa countdown.</p></div><div class="price-card"><h3>Admin Ads</h3><div class="price">CMS</div><p class="muted">Admin bisa mengatur iklan header/sidebar dari panel admin.</p></div></div></section>
+  </main><div id="toast" class="toast"></div><script src="/app.js"></script>
+</body>
+</html>
