@@ -10,7 +10,9 @@ test('vercel config uses serverless express entrypoint and no next build', () =>
 
   assert.equal(pkg.scripts['vercel-build'], 'node scripts/vercel-build.js');
   assert.equal(vercel.buildCommand, 'npm run vercel-build');
-  assert.equal(vercel.installCommand, 'npm ci --omit=dev');
+  assert.equal(vercel.installCommand, 'npm install --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/');
+  const npmrc = fs.readFileSync(path.join(root, '.npmrc'), 'utf8');
+  assert.match(npmrc, /registry=https:\/\/registry\.npmjs\.org\//);
   assert.ok(vercel.rewrites.some((rewrite) => rewrite.destination === '/api/index.js'));
   assert.equal(pkg.engines.node, '22.x');
 });
