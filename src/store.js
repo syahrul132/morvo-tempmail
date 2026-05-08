@@ -19,7 +19,15 @@ function defaultData() {
       adminPasswordHash: DEFAULT_ADMIN_PASSWORD_HASH,
       heroTitle: 'Email sementara yang cepat, privat, dan siap menerima pesan asli.',
       heroSubtitle: 'Buat inbox temporary, terima email penuh, kelola saldo, dan upgrade alamat menjadi unlimited.',
-      smtpMode: 'real'
+      smtpMode: 'real',
+      cryptoEnabled: true,
+      usdtRate: 16500,
+      wallets: {
+        base: '',
+        tron: '',
+        solana: ''
+      },
+      cryptoConfirmations: 1
     },
     mailboxes: [],
     messages: [],
@@ -66,6 +74,10 @@ function createFileStore(filePath) {
     current.settings.smtpMode = current.settings.smtpMode === 'queued' ? 'queued' : 'real';
     if (current.settings.creditPrice === undefined) current.settings.creditPrice = 1000;
     if (current.settings.unlimitedDurationDays === undefined) current.settings.unlimitedDurationDays = 90;
+    if (current.settings.cryptoEnabled === undefined) current.settings.cryptoEnabled = true;
+    if (current.settings.usdtRate === undefined) current.settings.usdtRate = 16500;
+    if (!current.settings.wallets) current.settings.wallets = { base: '', tron: '', solana: '' };
+    if (current.settings.cryptoConfirmations === undefined) current.settings.cryptoConfirmations = 1;
     current.users = current.users.map(migrateUser);
     fs.writeFileSync(filePath, JSON.stringify(current, null, 2));
   }

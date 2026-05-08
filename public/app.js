@@ -630,7 +630,12 @@
 
   // ─── Credits Slide Panel ──────────────────────────────────────────────────
   (function() {
-    var CREDIT_PRICE = 1000; // will be updated from settings
+    var CREDIT_PRICE = 1000;
+    var USDT_RATE = 16500;
+    var selectedNetwork = 'base';
+    var pendingPaymentId = null;
+    var pendingCryptoAmount = 0;
+
     var panel = document.getElementById('creditsPanel');
     var overlay = document.getElementById('creditsPanelOverlay');
     var closeBtn = document.getElementById('creditsPanelClose');
@@ -640,9 +645,38 @@
     var plusBtn = document.getElementById('creditsPlus');
     var priceEach = document.getElementById('creditsPriceEach');
     var totalPrice = document.getElementById('creditsTotalPrice');
-    var buyBtn = document.getElementById('creditsPanelBuy');
     var balanceEl = document.getElementById('creditsPanelBalance');
     var presets = document.querySelectorAll('.credits-preset');
+
+    // Crypto elements
+    var cryptoPriceEach = document.getElementById('cryptoPriceEach');
+    var cryptoCreditQty = document.getElementById('cryptoCreditQty');
+    var cryptoRateVal = document.getElementById('cryptoRateVal');
+    var cryptoTotalUSDT = document.getElementById('cryptoTotalUSDT');
+    var cryptoCreateBtn = document.getElementById('cryptoCreateBtn');
+    var cryptoWalletAddr = document.getElementById('cryptoWalletAddr');
+    var cryptoWalletNetwork = document.getElementById('cryptoWalletNetwork');
+    var cryptoPayAmount = document.getElementById('cryptoPayAmount');
+    var cryptoCopyAddr = document.getElementById('cryptoCopyAddr');
+    var cryptoTxHash = document.getElementById('cryptoTxHash');
+    var cryptoSubmitTxBtn = document.getElementById('cryptoSubmitTxBtn');
+    var cryptoBackBtn = document.getElementById('cryptoBackBtn');
+    var networkBtns = document.querySelectorAll('.crypto-network-btn');
+    var payTabs = document.querySelectorAll('.credits-pay-tab');
+    var cryptoSection = document.getElementById('cryptoSection');
+    var manualSection = document.getElementById('manualSection');
+    var manualBuyBtn = document.getElementById('manualBuyBtn');
+
+    var NET_LABELS = { base: 'Base (ERC-20)', tron: 'TRON (TRC-20)', solana: 'Solana (SPL)' };
+
+    function showStep(n) {
+      var s1 = document.getElementById('cryptoStep1');
+      var s2 = document.getElementById('cryptoStep2');
+      var s3 = document.getElementById('cryptoStep3');
+      if (s1) s1.style.display = n === 1 ? '' : 'none';
+      if (s2) s2.style.display = n === 2 ? '' : 'none';
+      if (s3) s3.style.display = n === 3 ? '' : 'none';
+    }
 
     function updateSummary() {
       var val = parseInt(input.value, 10) || 1;
@@ -654,6 +688,12 @@
       presets.forEach(function(btn) {
         btn.classList.toggle('active', parseInt(btn.dataset.amount, 10) === val);
       });
+      var totalIDR = val * CREDIT_PRICE;
+      var totalUSDT = (totalIDR / USDT_RATE).toFixed(2);
+      if (cryptoPriceEach) cryptoPriceEach.textContent = formatRupiah(CREDIT_PRICE);
+      if (cryptoCreditQty) cryptoCreditQty.textContent = val + ' kredit';
+      if (cryptoRateVal) cryptoRateVal.textContent = '1 USDT = ' + formatRupiah(USDT_RATE);
+      if (cryptoTotalUSDT) cryptoTotalUSDT.textContent = totalUSDT + ' USDT';
     }
 
     function setAmount(val) {
@@ -663,12 +703,19 @@
       updateSummary();
     }
 
+    function resetPanel() {
+      showStep(1);
+      pendingPaymentId = null;
+      pendingCryptoAmount = 0;
+    }
+
     function openPanel() {
+      resetPanel();
       loadCredits().then(function() {
         if (balanceEl) balanceEl.textContent = credits;
-        // Fetch latest credit price
         api('GET', '/api/settings').then(function(s) {
           if (s && s.creditPrice) CREDIT_PRICE = s.creditPrice;
+          if (s && s.usdtRate) USDT_RATE = s.usdtRate;
           updateSummary();
         }).catch(function() { updateSummary(); });
       });
@@ -681,37 +728,121 @@
       panel.classList.remove('open');
       overlay.classList.remove('open');
       document.body.style.overflow = '';
+      resetPanel();
     }
 
-    // Sync slider <-> input
+    // Slider + input
     slider.addEventListener('input', function() { setAmount(slider.value); });
     input.addEventListener('input', function() { setAmount(input.value); });
     minusBtn.addEventListener('click', function() { setAmount(parseInt(input.value, 10) - 1); });
     plusBtn.addEventListener('click', function() { setAmount(parseInt(input.value, 10) + 1); });
-
-    // Preset buttons
     presets.forEach(function(btn) {
       btn.addEventListener('click', function() { setAmount(btn.dataset.amount); });
     });
 
-    // Buy button
-    buyBtn.addEventListener('click', async function() {
-      var amount = parseInt(input.value, 10);
-      if (!amount || amount < 1) return showToast('Jumlah kredit minimal 1', 'error');
-      buyBtn.disabled = true;
-      buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-      try {
-        var data = await api('POST', '/api/credits/buy', { amount: amount });
-        showToast('Pembayaran dibuat! Menunggu persetujuan admin.', 'success');
-        closePanel();
-        loadCredits();
-      } catch (e) {
-        showToast(e.message, 'error');
-      } finally {
-        buyBtn.disabled = false;
-        buyBtn.innerHTML = '<i class="fas fa-bolt"></i> Beli Sekarang';
-      }
+    // Network selection
+    networkBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        networkBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedNetwork = btn.dataset.network;
+      });
     });
+
+    // Payment method tabs
+    payTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        payTabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var method = tab.dataset.method;
+        if (cryptoSection) cryptoSection.style.display = method === 'crypto' ? '' : 'none';
+        if (manualSection) manualSection.style.display = method === 'manual' ? '' : 'none';
+      });
+    });
+
+    // Step 1: Create crypto payment
+    if (cryptoCreateBtn) {
+      cryptoCreateBtn.addEventListener('click', async function() {
+        var amount = parseInt(input.value, 10);
+        if (!amount || amount < 1) return showToast('Jumlah kredit minimal 1', 'error');
+        cryptoCreateBtn.disabled = true;
+        cryptoCreateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
+        try {
+          var data = await api('POST', '/api/crypto/pay', { amount: amount, network: selectedNetwork });
+          if (data.payment) {
+            pendingPaymentId = data.payment.id;
+            pendingCryptoAmount = data.payment.cryptoAmount;
+            if (cryptoWalletAddr) cryptoWalletAddr.textContent = data.payment.cryptoWallet;
+            if (cryptoWalletNetwork) cryptoWalletNetwork.textContent = NET_LABELS[data.payment.cryptoNetwork] || data.payment.cryptoNetwork;
+            if (cryptoPayAmount) cryptoPayAmount.textContent = data.payment.cryptoAmount + ' USDT';
+            if (cryptoTxHash) cryptoTxHash.value = '';
+            showStep(2);
+          }
+        } catch (e) {
+          showToast(e.message, 'error');
+        } finally {
+          cryptoCreateBtn.disabled = false;
+          cryptoCreateBtn.innerHTML = '<i class="fas fa-wallet"></i> Buat Pembayaran';
+        }
+      });
+    }
+
+    // Step 2: Submit TX hash
+    if (cryptoSubmitTxBtn) {
+      cryptoSubmitTxBtn.addEventListener('click', async function() {
+        var txHash = cryptoTxHash ? cryptoTxHash.value.trim() : '';
+        if (!txHash) return showToast('Masukkan TX Hash terlebih dahulu', 'error');
+        if (!pendingPaymentId) return showToast('Tidak ada pembayaran aktif', 'error');
+        cryptoSubmitTxBtn.disabled = true;
+        cryptoSubmitTxBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+        try {
+          await api('POST', '/api/crypto/submit-tx', { paymentId: pendingPaymentId, txHash: txHash });
+          showStep(3);
+          showToast('TX Hash berhasil dikirim!', 'success');
+          loadCredits();
+        } catch (e) {
+          showToast(e.message, 'error');
+        } finally {
+          cryptoSubmitTxBtn.disabled = false;
+          cryptoSubmitTxBtn.innerHTML = '<i class="fas fa-check-circle"></i> Konfirmasi Pembayaran';
+        }
+      });
+    }
+
+    // Copy wallet address
+    if (cryptoCopyAddr) {
+      cryptoCopyAddr.addEventListener('click', function() {
+        var addr = cryptoWalletAddr ? cryptoWalletAddr.textContent : '';
+        if (addr && navigator.clipboard) {
+          navigator.clipboard.writeText(addr).then(function() {
+            showToast('Address disalin!', 'success');
+            cryptoCopyAddr.innerHTML = '<i class="fas fa-check"></i> Disalin!';
+            setTimeout(function() { cryptoCopyAddr.innerHTML = '<i class="fas fa-copy"></i> Salin Address'; }, 2000);
+          });
+        }
+      });
+    }
+
+    // Back button
+    if (cryptoBackBtn) {
+      cryptoBackBtn.addEventListener('click', function() { showStep(1); });
+    }
+
+    // Manual transfer
+    if (manualBuyBtn) {
+      manualBuyBtn.addEventListener('click', async function() {
+        var amount = parseInt(input.value, 10);
+        if (!amount || amount < 1) return showToast('Jumlah kredit minimal 1', 'error');
+        try {
+          await api('POST', '/api/credits/buy', { amount: amount });
+          showToast('Request pembayaran manual terkirim! Menunggu admin.', 'success');
+          closePanel();
+          loadCredits();
+        } catch (e) {
+          showToast(e.message, 'error');
+        }
+      });
+    }
 
     // Close panel
     closeBtn.addEventListener('click', closePanel);
@@ -720,7 +851,7 @@
       if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
     });
 
-    // Open panel from topbar credits badge
+    // Open from topbar credits badge
     var topbarCredits = document.getElementById('topbarCredits');
     if (topbarCredits) {
       topbarCredits.style.cursor = 'pointer';
@@ -731,7 +862,6 @@
       });
     }
 
-    // Initialize
     updateSummary();
   })();
 

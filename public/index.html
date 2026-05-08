@@ -447,18 +447,142 @@
           </div>
         </div>
 
-        <button class="credits-panel-buy" id="creditsPanelBuy">
-          <i class="fas fa-bolt"></i>
-          Beli Sekarang
-        </button>
+        <!-- Payment Method Tabs -->
+        <div class="credits-panel-section">
+          <label class="credits-panel-label">Metode Pembayaran</label>
+          <div class="credits-payment-tabs">
+            <button class="credits-pay-tab active" data-method="crypto" id="methodCrypto">
+              <i class="fas fa-link"></i> USDT Crypto
+            </button>
+            <button class="credits-pay-tab" data-method="manual" id="methodManual">
+              <i class="fas fa-university"></i> Transfer
+            </button>
+          </div>
+        </div>
 
-        <div class="credits-panel-note">
-          Pembayaran diproses manual oleh admin. Kredit ditambahkan setelah disetujui.
+        <!-- Crypto Payment Section -->
+        <div id="cryptoSection">
+          <!-- Step 1: Select Network and Create Payment -->
+          <div id="cryptoStep1">
+            <div class="crypto-step-indicator">
+              <span class="crypto-step active"><span class="crypto-step-dot">1</span> Pilih</span>
+              <span class="crypto-step-line"></span>
+              <span class="crypto-step"><span class="crypto-step-dot">2</span> Bayar</span>
+              <span class="crypto-step-line"></span>
+              <span class="crypto-step"><span class="crypto-step-dot">3</span> Selesai</span>
+            </div>
+
+            <label class="credits-panel-label">Jaringan Blockchain</label>
+            <div class="crypto-network-selector">
+              <button class="crypto-network-btn active" data-network="base">
+                <span>Base</span>
+                <span class="net-chain">ERC-20</span>
+              </button>
+              <button class="crypto-network-btn" data-network="tron">
+                <span>TRON</span>
+                <span class="net-chain">TRC-20</span>
+              </button>
+              <button class="crypto-network-btn" data-network="solana">
+                <span>Solana</span>
+                <span class="net-chain">SPL</span>
+              </button>
+            </div>
+
+            <div class="crypto-details">
+              <div class="crypto-detail-row">
+                <span>Harga/kredit</span>
+                <span id="cryptoPriceEach">Rp 1.000</span>
+              </div>
+              <div class="crypto-detail-row">
+                <span>Jumlah</span>
+                <span id="cryptoCreditQty">10 kredit</span>
+              </div>
+              <div class="crypto-detail-row">
+                <span>Kurs USDT</span>
+                <span id="cryptoRateVal">1 USDT = Rp 16.500</span>
+              </div>
+              <div class="crypto-detail-row" style="border-top:1px solid var(--border);padding-top:0.5rem;margin-top:0.25rem">
+                <span style="color:var(--text-primary);font-weight:700">Total Bayar</span>
+                <span class="crypto-detail-total" id="cryptoTotalUSDT">0.61 USDT</span>
+              </div>
+            </div>
+
+            <button class="crypto-submit-btn" id="cryptoCreateBtn">
+              <i class="fas fa-wallet"></i> Buat Pembayaran
+            </button>
+          </div>
+
+          <!-- Step 2: Send USDT + Submit TX Hash -->
+          <div id="cryptoStep2" style="display:none">
+            <div class="crypto-step-indicator">
+              <span class="crypto-step done"><span class="crypto-step-dot"><i class="fas fa-check"></i></span> Pilih</span>
+              <span class="crypto-step-line" style="background:#26a17b"></span>
+              <span class="crypto-step active"><span class="crypto-step-dot">2</span> Bayar</span>
+              <span class="crypto-step-line"></span>
+              <span class="crypto-step"><span class="crypto-step-dot">3</span> Selesai</span>
+            </div>
+
+            <div class="crypto-wallet-box">
+              <span class="crypto-wallet-label">Kirim USDT ke wallet ini</span>
+              <span class="crypto-wallet-addr-text" id="cryptoWalletAddr">-</span>
+              <span class="crypto-wallet-label" style="margin-top:0.25rem">Jaringan: <span id="cryptoWalletNetwork" style="color:var(--text-primary)">Base (ERC-20)</span></span>
+              <button class="crypto-wallet-copy" id="cryptoCopyAddr">
+                <i class="fas fa-copy"></i> Salin Address
+              </button>
+            </div>
+
+            <div class="crypto-detail-row" style="background:rgba(38,161,123,0.08);padding:0.6rem;border-radius:var(--radius-sm);margin-bottom:0.75rem">
+              <span style="color:var(--text-muted)">Jumlah yang harus dikirim</span>
+              <span id="cryptoPayAmount" style="color:#26a17b;font-weight:800;font-size:1.1rem;font-family:var(--cyber)">- USDT</span>
+            </div>
+
+            <div class="crypto-tx-input-wrap">
+              <span class="crypto-tx-label">Masukkan TX Hash setelah mengirim USDT</span>
+              <input type="text" class="crypto-tx-input-field" id="cryptoTxHash" placeholder="0xabc123def456...">
+            </div>
+
+            <button class="crypto-submit-btn" id="cryptoSubmitTxBtn">
+              <i class="fas fa-check-circle"></i> Konfirmasi Pembayaran
+            </button>
+
+            <button class="crypto-back-btn" id="cryptoBackBtn">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+
+          <!-- Step 3: Confirmation -->
+          <div id="cryptoStep3" style="display:none;text-align:center;padding:1.5rem 0">
+            <div class="crypto-step-indicator">
+              <span class="crypto-step done"><span class="crypto-step-dot"><i class="fas fa-check"></i></span> Pilih</span>
+              <span class="crypto-step-line" style="background:#26a17b"></span>
+              <span class="crypto-step done"><span class="crypto-step-dot"><i class="fas fa-check"></i></span> Bayar</span>
+              <span class="crypto-step-line" style="background:#26a17b"></span>
+              <span class="crypto-step active"><span class="crypto-step-dot">3</span> Selesai</span>
+            </div>
+            <div style="font-size:3rem;margin:1rem 0">✅</div>
+            <div style="font-weight:700;font-size:1.1rem;margin-bottom:0.5rem">Pembayaran Terkirim!</div>
+            <div style="color:var(--text-muted);font-size:0.85rem;line-height:1.5">TX Hash sudah dikirim.<br>Kredit akan ditambahkan setelah verifikasi blockchain.</div>
+          </div>
+        </div>
+
+        <!-- Manual Transfer Section -->
+        <div id="manualSection" style="display:none">
+          <div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.85rem">
+            Silakan hubungi admin untuk pembayaran manual.<br>
+            Kredit ditambahkan setelah admin menyetujui.
+          </div>
+          <button class="credits-panel-buy" id="manualBuyBtn">
+            <i class="fas fa-paper-plane"></i> Request Pembayaran Manual
+          </button>
+        </div>
+
+        <div class="credits-panel-note" id="creditsPanelNote">
+          Pembayaran USDT diverifikasi otomatis. Kredit ditambahkan setelah TX terkonfirmasi.
         </div>
       </div>
     </div>
 
-    <!-- Main Content Area -->
+        <!-- Main Content Area -->
     <main class="dashboard-main">
 
       <!-- Dashboard View -->

@@ -22,6 +22,13 @@ function publicSettings(data) {
     heroTitle: data.settings.heroTitle,
     heroSubtitle: data.settings.heroSubtitle,
     smtpMode: data.settings.smtpMode,
+    cryptoEnabled: data.settings.cryptoEnabled !== false,
+    usdtRate: data.settings.usdtRate || 16500,
+    wallets: {
+      base: data.settings.wallets?.base || '',
+      tron: data.settings.wallets?.tron || '',
+      solana: data.settings.wallets?.solana || ''
+    },
     ads: activeAds
   };
 }
@@ -227,7 +234,7 @@ function verifyAdmin(data, username, password) {
 }
 
 function updateSettings(data, payload) {
-  const allowed = ['siteName', 'freeHours', 'unlimitedPrice', 'allowSending', 'heroTitle', 'heroSubtitle', 'smtpMode'];
+  const allowed = ['siteName', 'freeHours', 'unlimitedPrice', 'creditPrice', 'allowSending', 'heroTitle', 'heroSubtitle', 'smtpMode', 'cryptoEnabled', 'usdtRate'];
   for (const key of allowed) {
     if (payload[key] !== undefined) data.settings[key] = payload[key];
   }
@@ -236,6 +243,17 @@ function updateSettings(data, payload) {
   data.settings.unlimitedPrice = Math.max(0, Number(data.settings.unlimitedPrice) || 0);
   data.settings.allowSending = Boolean(data.settings.allowSending);
   data.settings.smtpMode = data.settings.smtpMode === 'queued' ? 'queued' : 'real';
+  // Update wallet addresses if provided
+  if (payload.wallets && typeof payload.wallets === 'object') {
+    data.settings.wallets ||= {};
+    for (const net of ['base', 'tron', 'solana']) {
+      if (payload.wallets[net] !== undefined) {
+        data.settings.wallets[net] = String(payload.wallets[net]).trim();
+      }
+    }
+  }
+  if (payload.usdtRate) data.settings.usdtRate = Math.max(1, Number(payload.usdtRate) || 16500);
+  if (payload.cryptoEnabled !== undefined) data.settings.cryptoEnabled = Boolean(payload.cryptoEnabled);
   return data.settings;
 }
 

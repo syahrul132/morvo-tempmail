@@ -277,6 +277,73 @@ function createApp({ store, sessionSecret = process.env.SESSION_SECRET || 'chang
     res.json({ credits: user.credits, plan: user.plan, apiKey: user.apiKey });
   });
 
+
+  // Crypto payment (USDT) — create pending payment with crypto details
+  app.post('/api/crypto/pay', requireUser, (req, res, next) => {
+    try {
+      const creditAmount = Math.max(1, Number(req.body.amount) || 0);
+      const network = String(req.body.network || 'base');
+      const settings = store.read().settings;
+      const pricePerCredit = Number(settings.creditPrice) || 1000;
+      const totalIDR = creditAmount * pricePerCredit;
+      const usdtRate = Number(settings.usdtRate) || 16500;
+      const totalUSDT = Number((totalIDR / usdtRate).toFixed(2));
+      const wallet = (settings.wallets || {})[network] || '';
+
+      if (!settings.cryptoEnabled) {
+        return res.status(400).json({ error: 'Pembayaran crypto tidak tersedia' });
+      }
+      if (!wallet) {
+        return res.status(400).json({ error: 'Wallet untuk jaringan ' + network + ' belum dikonfigurasi' });
+      }
+
+      const payment = store.mutate((data) => createPayment(data, req.session.user.id, {
+        amount: totalIDR,
+        type: 'credits',
+        method: 'crypto-usdt-' + network,
+        metadata: {
+          creditAmount,
+          cryptoNetwork: network,
+          cryptoAmount: totalUSDT,
+          cryptoRate: usdtRate,
+          cryptoWallet: wallet,
+          txHash: null,
+          status: 'awaiting_payment'
+        },
+        note: `Beli ${creditAmount} kredit via USDT (${network.toUpperCase()}) — ${totalUSDT} USDT`
+      }));
+
+      res.json({
+        payment: {
+          id: payment.id,
+          amount: totalIDR,
+          cryptoAmount: totalUSDT,
+          cryptoRate: usdtRate,
+          cryptoNetwork: network,
+          cryptoWallet: wallet
+        }
+      });
+    } catch (err) { next(err); }
+  });
+
+  // Submit TX hash after user sends USDT
+  app.post('/api/crypto/submit-tx', requireUser, (req, res, next) => {
+    try {
+      const { paymentId, txHash } = req.body;
+      if (!paymentId || !txHash) return res.status(400).json({ error: 'paymentId dan txHash wajib diisi' });
+      const payment = store.mutate((data) => {
+        const p = (data.payments || []).find((x) => x.id === paymentId);
+        if (!p) { const e = new Error('Payment not found'); e.status = 404; throw e; }
+        if (p.userId !== req.session.user.id) { const e = new Error('Akses ditolak'); e.status = 403; throw e; }
+        p.metadata.txHash = String(txHash).trim();
+        p.metadata.status = 'verifying';
+        p.note = p.note + ' | TX: ' + String(txHash).trim();
+        return { id: p.id, status: p.metadata.status };
+      });
+      res.json({ ok: true, payment });
+    } catch (err) { next(err); }
+  });
+
   // Buy credits → create payment request (requires admin approval)
   app.post('/api/credits/buy', requireUser, (req, res, next) => {
     try {
