@@ -1,6 +1,6 @@
-# ADZ TempMail Fullstack
+# MORVO TempMail Fullstack
 
-Fullstack prototype temporary email dengan domain mailbox `adzstore.my.id`.
+Fullstack prototype temporary email dengan domain mailbox `morvo.me`.
 
 ## Run
 
@@ -31,7 +31,7 @@ npm test
 
 User:
 
-- Generate temporary email `*@adzstore.my.id`
+- Generate temporary email `*@morvo.me`
 - Free plan 24 jam sesuai setting admin
 - Inbox API
 - Send email API mode demo/queued
@@ -52,28 +52,41 @@ Admin:
 ## API utama
 
 ```bash
-POST /api/mailboxes
+POST /api/mailboxes                 # body: {"prefix":"demo"} optional
 GET  /api/mailboxes/:id/messages
 POST /api/inbound
 POST /api/mailboxes/:id/send
 POST /api/mailboxes/:id/topup
 POST /api/mailboxes/:id/upgrade
 GET  /api/settings
+POST /api/admin/login
+PUT  /api/admin/settings
+POST /api/admin/ads
 ```
+
+## Deploy Vercel
+
+Project ini sudah disiapkan sebagai Express serverless handler:
+
+- `api/index.js` mengekspor Express app, tanpa `listen()`.
+- `vercel.json` mengarahkan request ke handler.
+- `npm run vercel-build` adalah no-op agar Vercel tidak salah mendeteksi Next.js.
+
+Catatan: JSON file store tidak durable di serverless. Untuk produksi gunakan DB eksternal.
 
 Contoh inbound webhook:
 
 ```bash
 curl -X POST http://127.0.0.1:3000/api/inbound \
   -H 'Content-Type: application/json' \
-  -d '{"to":"akses12345@adzstore.my.id","from":"otp@example.com","subject":"OTP","body":"Kode 123456"}'
+  -d '{"to":"akses12345@morvo.me","from":"otp@example.com","subject":"OTP","body":"Kode 123456"}'
 ```
 
 ## Catatan produksi
 
 Project ini sudah fullstack, tapi receive/send email real masih perlu integrasi infra:
 
-1. DNS domain `adzstore.my.id`:
+1. DNS domain `morvo.me`:
    - MX record mengarah ke mail server inbound.
    - SPF/DKIM/DMARC untuk pengiriman.
 2. Inbound mail server:

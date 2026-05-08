@@ -3,3 +3,6 @@ data/*.json
 .env
 .DS_Store
 npm-debug.log*
+public-backup-*/
+src-backup-*/
+*.monolith.bak

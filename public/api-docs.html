@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MORVO TempMail — API Documentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous">
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --bg2: #0d0d18;
+      --bg3: #111122;
+      --bg4: #080812;
+      --card: rgba(0,255,255,0.02);
+      --border: rgba(0,255,255,0.08);
+      --border2: rgba(0,255,255,0.15);
+      --text: #e0e0f0;
+      --text2: #7888a8;
+      --text3: #445570;
+      --cyan: #00ffff;
+      --cyan2: #00ccdd;
+      --magenta: #ff00ff;
+      --magenta2: #cc44cc;
+      --neon: #39ff14;
+      --neon2: #00ff88;
+      --yellow: #ffe600;
+      --red: #ff3344;
+      --blue: #4488ff;
+      --orange: #ff8800;
+      --radius: 12px;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --cyber: 'Orbitron', 'Inter', sans-serif;
+      --glow-cyan: 0 0 10px rgba(0,255,255,0.3), 0 0 30px rgba(0,255,255,0.1);
+      --glow-magenta: 0 0 10px rgba(255,0,255,0.3), 0 0 30px rgba(255,0,255,0.1);
+      --glow-neon: 0 0 10px rgba(57,255,20,0.3), 0 0 30px rgba(57,255,20,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    ::selection { background: rgba(0,255,255,0.3); color: #fff; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.4); }
+
+    /* ═══════════ SCANLINES OVERLAY ═══════════ */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,255,0.01) 2px,
+        rgba(0,255,255,0.01) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ═══════════ ANIMATED GRID BG ═══════════ */
+    .cyber-grid {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes gridMove {
+      0% { transform: perspective(500px) rotateX(1deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(1deg) translateY(-60px); }
+    }
+
+    /* ═══════════ FLOATING PARTICLES ═══════════ */
+    .particles {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: var(--cyan);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat 8s ease-in-out infinite;
+    }
+    @keyframes particleFloat {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.3; }
+      100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+    }
+
+    /* ═══════════ GLITCH TEXT ═══════════ */
+    .glitch {
+      position: relative;
+      display: inline-block;
+    }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+    }
+    .glitch::before {
+      color: var(--cyan);
+      z-index: -1;
+      animation: glitchTop 3s infinite linear alternate-reverse;
+      clip-path: inset(0 0 60% 0);
+    }
+    .glitch::after {
+      color: var(--magenta);
+      z-index: -2;
+      animation: glitchBottom 2.5s infinite linear alternate-reverse;
+      clip-path: inset(60% 0 0 0);
+    }
+    @keyframes glitchTop {
+      0%, 90% { transform: translate(0); }
+      92% { transform: translate(-3px, 1px); }
+      94% { transform: translate(3px, -1px); }
+      96% { transform: translate(-1px, 2px); }
+      98% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+    @keyframes glitchBottom {
+      0%, 88% { transform: translate(0); }
+      90% { transform: translate(2px, -1px); }
+      93% { transform: translate(-2px, 2px); }
+      96% { transform: translate(1px, -1px); }
+      100% { transform: translate(0); }
+    }
+
+    /* ═══════════ NEON BORDERS ═══════════ */
+    @keyframes neonPulse {
+      0%, 100% { box-shadow: 0 0 5px rgba(0,255,255,0.1), inset 0 0 5px rgba(0,255,255,0.05); }
+      50% { box-shadow: 0 0 15px rgba(0,255,255,0.15), inset 0 0 10px rgba(0,255,255,0.08); }
+    }
+    @keyframes borderGlow {
+      0% { border-color: rgba(0,255,255,0.15); }
+      33% { border-color: rgba(255,0,255,0.15); }
+      66% { border-color: rgba(57,255,20,0.15); }
+      100% { border-color: rgba(0,255,255,0.15); }
+    }
+
+    /* ═══════════ LAYOUT ═══════════ */
+    .page { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+    /* ═══════════ SIDEBAR ═══════════ */
+    .sidebar {
+      width: 280px; background: rgba(10,10,20,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100;
+      padding: 24px 0;
+      animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .sidebar-brand {
+      font-family: var(--cyber);
+      font-size: 16px; font-weight: 700; color: var(--cyan);
+      padding: 0 24px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+      text-shadow: var(--glow-cyan);
+      letter-spacing: 2px;
+    }
+    .sidebar-brand i {
+      font-size: 22px;
+      animation: brandPulse 2s ease-in-out infinite;
+    }
+    @keyframes brandPulse {
+      0%, 100% { text-shadow: 0 0 10px rgba(0,255,255,0.5); transform: scale(1); }
+      50% { text-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,255,255,0.3); transform: scale(1.1); }
+    }
+    .sidebar-section {
+      padding: 12px 24px 4px; font-family: var(--cyber); font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px; color: var(--cyan);
+      opacity: 0.6;
+    }
+    .sidebar a {
+      display: flex; align-items: center; gap: 10px; padding: 9px 24px;
+      color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500;
+      border-left: 3px solid transparent; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .sidebar a::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+      background: linear-gradient(90deg, rgba(0,255,255,0.08), transparent);
+      transition: width 0.3s;
+    }
+    .sidebar a:hover::before { width: 100%; }
+    .sidebar a:hover { color: var(--cyan); border-left-color: rgba(0,255,255,0.3); transform: translateX(3px); }
+    .sidebar a.active {
+      color: var(--cyan); border-left-color: var(--cyan);
+      background: rgba(0,255,255,0.05);
+      text-shadow: 0 0 8px rgba(0,255,255,0.3);
+    }
+    .sidebar .method-badge {
+      display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px;
+      font-weight: 700; font-family: var(--mono); letter-spacing: 0.5px; min-width: 38px; text-align: center;
+    }
+    .method-get { background: rgba(57,255,20,0.1); color: var(--neon); border: 1px solid rgba(57,255,20,0.2); }
+    .method-post { background: rgba(0,255,255,0.1); color: var(--cyan); border: 1px solid rgba(0,255,255,0.2); }
+    .method-put { background: rgba(255,136,0,0.1); color: var(--orange); border: 1px solid rgba(255,136,0,0.2); }
+    .method-delete { background: rgba(255,51,68,0.1); color: var(--red); border: 1px solid rgba(255,51,68,0.2); }
+
+    .content { margin-left: 280px; flex: 1; padding: 48px 48px 100px; max-width: 980px; }
+
+    /* ═══════════ HEADER ═══════════ */
+    .doc-header {
+      margin-bottom: 48px; padding-bottom: 36px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .doc-header h1 {
+      font-family: var(--cyber);
+      font-size: 36px; font-weight: 900;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+      margin-bottom: 12px;
+      letter-spacing: 3px;
+    }
+    .doc-header h1 i {
+      margin-right: 14px;
+      animation: boltFlash 1.5s ease-in-out infinite;
+    }
+    @keyframes boltFlash {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      50% { opacity: 0.7; filter: brightness(1.5); }
+    }
+    .doc-header p { color: var(--text2); font-size: 15px; max-width: 600px; }
+    .doc-header .base-url {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 20px;
+      background: rgba(0,255,255,0.04); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 12px 20px;
+      font-family: var(--mono); font-size: 14px; color: var(--cyan);
+      animation: neonPulse 3s ease-in-out infinite;
+    }
+    .doc-header .base-url .label {
+      font-family: var(--cyber); font-size: 10px; font-weight: 700;
+      color: var(--magenta); text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    /* ═══════════ AUTH BOX ═══════════ */
+    .auth-box {
+      background: rgba(0,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.12);
+      border-radius: var(--radius); padding: 22px 28px; margin-bottom: 24px;
+      position: relative; overflow: hidden;
+      transition: all 0.3s;
+    }
+    .auth-box:hover {
+      border-color: rgba(0,255,255,0.25);
+      box-shadow: 0 0 20px rgba(0,255,255,0.05);
+    }
+    .auth-box::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      animation: scanLine 4s linear infinite;
+    }
+    @keyframes scanLine {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+    .auth-box h3 { font-size: 15px; color: var(--cyan); margin-bottom: 8px; }
+    .auth-box p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+    .auth-box code {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--neon); background: rgba(0,0,0,0.3);
+      padding: 3px 8px; border-radius: 4px;
+      border: 1px solid rgba(57,255,20,0.15);
+    }
+
+    /* ═══════════ SECTIONS ═══════════ */
+    .api-section {
+      margin-bottom: 56px; scroll-margin-top: 24px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .api-section > h2 {
+      font-family: var(--cyber);
+      font-size: 18px; font-weight: 700; margin-bottom: 10px;
+      padding-bottom: 14px; border-bottom: 2px solid var(--border);
+      color: var(--cyan);
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0,255,255,0.2);
+    }
+    .api-section > h2 i { margin-right: 10px; color: var(--magenta); }
+    .api-section > p { color: var(--text2); font-size: 14px; margin-bottom: 20px; }
+
+    /* ═══════════ ENDPOINT CARDS ═══════════ */
+    .endpoint {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px; overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .endpoint::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .endpoint:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .endpoint:hover::before { opacity: 1; }
+    .endpoint-header {
+      display: flex; align-items: center; gap: 12px; padding: 16px 22px;
+      cursor: pointer; user-select: none; transition: background 0.2s;
+    }
+    .endpoint-header:hover { background: rgba(0,255,255,0.02); }
+    .endpoint .method {
+      display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 12px;
+      font-weight: 700; font-family: var(--mono); min-width: 56px; text-align: center;
+      transition: all 0.3s;
+    }
+    .endpoint .method.get { background: rgba(57,255,20,0.1); color: var(--neon); border: 1px solid rgba(57,255,20,0.2); }
+    .endpoint .method.post { background: rgba(0,255,255,0.1); color: var(--cyan); border: 1px solid rgba(0,255,255,0.2); }
+    .endpoint .method.put { background: rgba(255,136,0,0.1); color: var(--orange); border: 1px solid rgba(255,136,0,0.2); }
+    .endpoint .method.delete { background: rgba(255,51,68,0.1); color: var(--red); border: 1px solid rgba(255,51,68,0.2); }
+    .endpoint .path { font-family: var(--mono); font-size: 14px; color: var(--text); font-weight: 500; }
+    .endpoint .desc { font-size: 13px; color: var(--text2); margin-left: auto; text-align: right; }
+    .endpoint .arrow {
+      color: var(--cyan); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 11px;
+      opacity: 0.6;
+    }
+    .endpoint.open .arrow { transform: rotate(90deg); opacity: 1; }
+    .endpoint-body {
+      display: none; padding: 0 22px 22px;
+      border-top: 1px solid var(--border);
+      animation: bodyExpand 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .endpoint.open .endpoint-body { display: block; }
+    @keyframes bodyExpand {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════ PARAM TABLES ═══════════ */
+    .params-title {
+      font-family: var(--cyber);
+      font-size: 11px; font-weight: 700; color: var(--magenta);
+      margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 2px;
+    }
+    .param-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .param-table th {
+      text-align: left; padding: 10px 14px;
+      font-family: var(--cyber); font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; color: var(--cyan);
+      background: rgba(0,255,255,0.03); border-bottom: 1px solid var(--border);
+    }
+    .param-table td {
+      padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: background 0.2s;
+    }
+    .param-table tr:hover td { background: rgba(0,255,255,0.02); }
+    .param-table .param-name { font-family: var(--mono); color: var(--neon); font-weight: 500; }
+    .param-table .param-type { color: var(--magenta2); font-size: 12px; font-family: var(--mono); }
+    .param-table .required {
+      color: var(--red); font-size: 10px; font-weight: 700;
+      font-family: var(--cyber); letter-spacing: 1px;
+      animation: reqBlink 2s ease-in-out infinite;
+    }
+    @keyframes reqBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ═══════════ CODE BLOCKS ═══════════ */
+    .code-block {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 18px; margin-top: 14px;
+      overflow-x: auto; position: relative;
+      font-family: var(--mono);
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+      background: linear-gradient(180deg, var(--cyan), var(--magenta));
+      border-radius: 3px 0 0 3px;
+    }
+    .code-block pre {
+      font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--text);
+    }
+    .code-block .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,255,255,0.06); border: 1px solid var(--border2);
+      color: var(--cyan); border-radius: 6px; padding: 5px 12px; font-size: 11px;
+      cursor: pointer; font-family: var(--cyber); font-weight: 700;
+      letter-spacing: 1px; transition: all 0.25s;
+    }
+    .code-block .copy-btn:hover {
+      background: rgba(0,255,255,0.15);
+      box-shadow: 0 0 12px rgba(0,255,255,0.2);
+      transform: translateY(-1px);
+    }
+    .code-block .comment { color: var(--text3); font-style: italic; }
+    .code-block .string { color: var(--neon); }
+    .code-block .key { color: var(--cyan); }
+
+    /* ═══════════ RESPONSE BADGES ═══════════ */
+    .response-title {
+      font-family: var(--cyber);
+      font-size: 11px; font-weight: 700; color: var(--text2);
+      margin: 18px 0 10px; display: flex; align-items: center; gap: 10px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .status-badge {
+      padding: 3px 10px; border-radius: 4px; font-size: 11px;
+      font-weight: 700; font-family: var(--mono);
+    }
+    .status-200 { background: rgba(57,255,20,0.1); color: var(--neon); border: 1px solid rgba(57,255,20,0.2); }
+    .status-201 { background: rgba(57,255,20,0.1); color: var(--neon); border: 1px solid rgba(57,255,20,0.2); }
+    .status-400 { background: rgba(255,136,0,0.1); color: var(--orange); border: 1px solid rgba(255,136,0,0.2); }
+    .status-401 { background: rgba(255,51,68,0.1); color: var(--red); border: 1px solid rgba(255,51,68,0.2); }
+    .status-402 { background: rgba(255,51,68,0.1); color: var(--red); border: 1px solid rgba(255,51,68,0.2); }
+
+    /* ═══════════ QUICK START ═══════════ */
+    .quickstart {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px; margin-bottom: 40px;
+      position: relative; overflow: hidden;
+      animation: neonPulse 4s ease-in-out infinite;
+    }
+    .quickstart::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--neon), var(--cyan));
+      background-size: 300% 100%;
+      animation: rainbowShift 4s linear infinite;
+    }
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+    .quickstart h3 {
+      font-family: var(--cyber); font-size: 15px;
+      color: var(--cyan); margin-bottom: 14px; letter-spacing: 2px;
+    }
+    .quickstart ol { padding-left: 20px; }
+    .quickstart li {
+      margin-bottom: 14px; font-size: 14px; color: var(--text2);
+      padding-left: 6px;
+    }
+    .quickstart li strong { color: var(--cyan); }
+    .quickstart li code {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--neon); background: rgba(0,0,0,0.3);
+      padding: 2px 6px; border-radius: 4px;
+      border: 1px solid rgba(57,255,20,0.1);
+    }
+
+    /* ═══════════ PRICING TABLE ═══════════ */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-top: 12px;
+    }
+    .pricing-card {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; text-align: center;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative; overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,255,0.05), transparent);
+      transition: left 0.5s;
+    }
+    .pricing-card:hover::before { left: 100%; }
+    .pricing-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,255,255,0.08);
+    }
+    .pricing-card .plan-name {
+      font-family: var(--cyber); font-size: 13px; font-weight: 700;
+      color: var(--cyan); margin-bottom: 10px; letter-spacing: 2px;
+    }
+    .pricing-card .plan-price {
+      font-family: var(--mono); font-size: 20px; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .pricing-card .plan-detail {
+      font-size: 12px; color: var(--text2);
+    }
+    .pricing-card.highlight {
+      border-color: var(--magenta);
+      background: rgba(255,0,255,0.03);
+    }
+    .pricing-card.highlight .plan-name { color: var(--magenta); }
+    .pricing-card.highlight::after {
+      content: 'BEST VALUE';
+      position: absolute; top: 12px; right: -30px;
+      background: var(--magenta); color: #fff;
+      font-family: var(--cyber); font-size: 9px; font-weight: 700;
+      padding: 3px 36px; transform: rotate(45deg);
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════ HAMBURGER ═══════════ */
+    .mobile-toggle {
+      display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
+      background: rgba(10,10,20,0.9); border: 1px solid var(--border2);
+      border-radius: 8px; width: 42px; height: 42px; color: var(--cyan);
+      cursor: pointer; font-size: 18px;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s;
+    }
+    .mobile-toggle:hover {
+      box-shadow: 0 0 15px rgba(0,255,255,0.2);
+      border-color: var(--cyan);
+    }
+
+    /* ═══════════ INTERSECTION OBSERVER ANIMATIONS ═══════════ */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════ TYPING CURSOR ═══════════ */
+    .typing-cursor::after {
+      content: '█'; color: var(--cyan); font-weight: 400;
+      animation: cursorBlink 1s step-end infinite;
+    }
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ═══════════ MOBILE RESPONSIVE ═══════════ */
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+      .sidebar.open { transform: translateX(0); box-shadow: 5px 0 30px rgba(0,0,0,0.5); }
+      .content { margin-left: 0; padding: 24px 18px 80px; }
+      .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+      .endpoint .desc { display: none; }
+      .doc-header h1 { font-size: 26px; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ═══════════ LOADING SHIMMER ═══════════ */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .loading-shimmer {
+      background: linear-gradient(90deg, transparent 0%, rgba(0,255,255,0.05) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+
+    /* ═══════════ SCROLL PROGRESS BAR ═══════════ */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--magenta));
+      z-index: 9998; width: 0%;
+      transition: width 0.1s;
+      box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+
+    /* ═══════════ BACK TO TOP ═══════════ */
+    .back-to-top {
+      position: fixed; bottom: 30px; right: 30px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(10,10,20,0.9); border: 1px solid var(--border2);
+      color: var(--cyan); font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; transform: translateY(20px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
+    }
+    .back-to-top.visible { opacity: 1; transform: translateY(0); }
+    .back-to-top:hover {
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="cyber-grid"></div>
+  <div class="particles" id="particles"></div>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <button class="mobile-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+  <button class="back-to-top" id="backToTop"><i class="fas fa-chevron-up"></i></button>
+
+  <div class="page">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fas fa-bolt"></i> MORVO API
+      </div>
+
+      <div class="sidebar-section">Getting Started</div>
+      <a href="#overview"><i class="fas fa-crosshairs"></i> Overview</a>
+      <a href="#quickstart"><i class="fas fa-rocket"></i> Quick Start</a>
+      <a href="#authentication"><i class="fas fa-shield-halved"></i> Authentication</a>
+
+      <div class="sidebar-section">External API</div>
+      <a href="#ext-create-mailbox"><span class="method-badge method-post">POST</span> /external/mailbox</a>
+      <a href="#ext-list-mailbox"><span class="method-badge method-get">GET</span> /external/mailbox</a>
+      <a href="#ext-messages"><span class="method-badge method-get">GET</span> /external/messages</a>
+
+      <div class="sidebar-section">User Auth</div>
+      <a href="#auth-register"><span class="method-badge method-post">POST</span> /auth/register</a>
+      <a href="#auth-login"><span class="method-badge method-post">POST</span> /auth/login</a>
+      <a href="#auth-logout"><span class="method-badge method-post">POST</span> /auth/logout</a>
+      <a href="#auth-me"><span class="method-badge method-get">GET</span> /auth/me</a>
+
+      <div class="sidebar-section">Account & Credits</div>
+      <a href="#account"><span class="method-badge method-get">GET</span> /account</a>
+      <a href="#credits"><span class="method-badge method-get">GET</span> /credits</a>
+      <a href="#credits-buy"><span class="method-badge method-post">POST</span> /credits/buy</a>
+      <a href="#plan-upgrade"><span class="method-badge method-post">POST</span> /plan/upgrade</a>
+
+      <div class="sidebar-section">Mailbox</div>
+      <a href="#mb-create"><span class="method-badge method-post">POST</span> /mailboxes</a>
+      <a href="#mb-get"><span class="method-badge method-get">GET</span> /mailboxes/:id</a>
+      <a href="#mb-messages"><span class="method-badge method-get">GET</span> /mailboxes/:id/messages</a>
+      <a href="#mb-send"><span class="method-badge method-post">POST</span> /mailboxes/:id/send</a>
+      <a href="#mb-sent"><span class="method-badge method-get">GET</span> /mailboxes/:id/sent</a>
+
+      <div class="sidebar-section">API Key</div>
+      <a href="#apikey-get"><span class="method-badge method-get">GET</span> /apikey</a>
+      <a href="#apikey-regen"><span class="method-badge method-post">POST</span> /apikey/regenerate</a>
+
+      <div class="sidebar-section">Public</div>
+      <a href="#health"><span class="method-badge method-get">GET</span> /health</a>
+      <a href="#settings"><span class="method-badge method-get">GET</span> /settings</a>
+      <a href="#inbound"><span class="method-badge method-post">POST</span> /inbound</a>
+    </aside>
+
+    <main class="content">
+
+      <!-- Header -->
+      <div class="doc-header" id="overview">
+        <h1 class="glitch" data-text="MORVO TempMail API"><i class="fas fa-bolt"></i> MORVO TempMail API</h1>
+        <p>Dokumentasi lengkap API MORVO TempMail Express. Buat email sementara, terima pesan, dan integrasikan ke aplikasi Anda.</p>
+        <div class="base-url">
+          <span class="label">Base URL</span>
+          https://morvo.me/api
+        </div>
+      </div>
+
+      <!-- Quick Start -->
+      <div class="quickstart reveal" id="quickstart">
+        <h3>⚡ QUICK START</h3>
+        <ol>
+          <li><strong>Daftar akun</strong> — POST /api/auth/register → dapat 3 credits gratis</li>
+          <li><strong>Login</strong> — POST /api/auth/login → dapat session cookie</li>
+          <li><strong>Buat mailbox</strong> — POST /api/mailboxes → buang 1 credit</li>
+          <li><strong>Cek pesan</strong> — GET /api/mailboxes/:id/messages → auto-refresh setiap 10 detik</li>
+          <li><strong>Upgrade Premium</strong> — POST /api/plan/upgrade → unlimited credits + API key</li>
+        </ol>
+      </div>
+
+      <!-- Authentication -->
+      <div class="api-section reveal" id="authentication">
+        <h2><i class="fas fa-shield-halved"></i> AUTHENTICATION</h2>
+        <p>Dua cara autentikasi: session cookie (browser) atau API key (automation).</p>
+
+        <div class="auth-box">
+          <h3><i class="fas fa-cookie-bite"></i> Session-based Auth (Browser)</h3>
+          <p>Login via POST /api/auth/login. Session cookie otomatis disimpan. Gunakan <code>credentials: 'same-origin'</code> di fetch.</p>
+        </div>
+
+        <div class="auth-box">
+          <h3><i class="fas fa-key"></i> API Key Auth (Automation)</h3>
+          <p>Gunakan header <code>X-Api-Key: YOUR_KEY</code> di setiap request. API key hanya tersedia untuk plan Premium (Unlimited). Generate dari dashboard setelah upgrade.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════ EXTERNAL API ═══════════ -->
+      <div class="api-section reveal" id="ext-create-mailbox">
+        <h2><i class="fas fa-code"></i> EXTERNAL API <span style="font-size:12px;color:var(--yellow);font-weight:700;font-family:var(--cyber);letter-spacing:1px">// PREMIUM ONLY</span></h2>
+        <p>API endpoint untuk automation. Gunakan API key dari header <code>X-Api-Key</code>.</p>
+
+        <!-- POST /external/mailbox -->
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/external/mailbox</span>
+            <span class="desc">Buat mailbox baru via API key</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Headers</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">X-Api-Key</td><td class="param-type">string</td><td>API key Anda <span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">Content-Type</td><td class="param-type">string</td><td>application/json</td></tr>
+            </table>
+            <div class="params-title">Body (opsional)</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">localPart</td><td class="param-type">string</td><td>Nama depan email (random jika kosong)</td></tr>
+            </table>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre><span class="comment">// Buat mailbox baru</span>
+curl -X POST https://morvo.me/api/external/mailbox \
+  -H <span class="string">"X-Api-Key: tm_abc123..."</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"localPart": "myinbox"}'</span></pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-201">201</span></div>
+            <div class="code-block">
+              <pre>{
+  <span class="key">"mailbox"</span>: {
+    <span class="key">"id"</span>: <span class="string">"mbx_a1b2c3..."</span>,
+    <span class="key">"address"</span>: <span class="string">"myinbox@adzstore.my.id"</span>,
+    <span class="key">"plan"</span>: <span class="string">"free"</span>
+  },
+  <span class="key">"credits"</span>: 98
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- GET /external/mailbox -->
+        <div class="endpoint" id="ext-list-mailbox">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/external/mailbox</span>
+            <span class="desc">Ambil semua mailbox milik Anda</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Headers</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">X-Api-Key</td><td class="param-type">string</td><td>API key Anda <span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre><span class="comment">// Ambil daftar mailbox</span>
+curl -H <span class="string">"X-Api-Key: tm_abc123..."</span> \
+  https://morvo.me/api/external/mailbox</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block">
+              <pre>{
+  <span class="key">"mailboxes"</span>: [
+    { <span class="key">"id"</span>: <span class="string">"mbx_..."</span>, <span class="key">"address"</span>: <span class="string">"myinbox@adzstore.my.id"</span>, <span class="key">"plan"</span>: <span class="string">"free"</span> }
+  ]
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- GET /external/messages -->
+        <div class="endpoint" id="ext-messages">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/external/messages</span>
+            <span class="desc">Ambil semua pesan masuk</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Headers</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">X-Api-Key</td><td class="param-type">string</td><td>API key Anda <span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre><span class="comment">// Ambil semua pesan dari semua mailbox</span>
+curl -H <span class="string">"X-Api-Key: tm_abc123..."</span> \
+  https://morvo.me/api/external/messages</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block">
+              <pre>{
+  <span class="key">"messages"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="string">"msg_..."</span>,
+      <span class="key">"to"</span>: <span class="string">"myinbox@adzstore.my.id"</span>,
+      <span class="key">"from"</span>: <span class="string">"noreply@github.com"</span>,
+      <span class="key">"subject"</span>: <span class="string">"Verify your email"</span>,
+      <span class="key">"body"</span>: <span class="string">"...full content..."</span>,
+      <span class="key">"createdAt"</span>: <span class="string">"2026-05-08T..."</span>
+    }
+  ]
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ USER AUTH ═══════════ -->
+      <div class="api-section reveal" id="auth-register">
+        <h2><i class="fas fa-user-plus"></i> USER AUTHENTICATION</h2>
+        <p>Endpoint untuk registrasi, login, dan manajemen sesi.</p>
+
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/auth/register</span>
+            <span class="desc">Daftar akun baru (+3 credits gratis)</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">name</td><td class="param-type">string</td><td>Nama lengkap <span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">email</td><td class="param-type">string</td><td>Email valid <span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">password</td><td class="param-type">string</td><td>Min 6 karakter <span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/auth/register \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"name":"Budi","email":"budi@mail.com","password":"rahasia123"}'</span></pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-201">201</span></div>
+            <div class="code-block">
+              <pre>{ <span class="key">"ok"</span>: true, <span class="key">"user"</span>: { <span class="key">"id"</span>: <span class="string">"usr_..."</span>, <span class="key">"name"</span>: <span class="string">"Budi"</span>, <span class="key">"credits"</span>: 3, <span class="key">"plan"</span>: <span class="string">"free"</span> } }</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Login -->
+        <div class="endpoint" id="auth-login">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/auth/login</span>
+            <span class="desc">Login dan dapatkan session</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">email</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">password</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/auth/login \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"email":"budi@mail.com","password":"rahasia123"}'</span></pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"ok"</span>: true, <span class="key">"user"</span>: { ... } }</pre></div>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="endpoint" id="auth-logout">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/auth/logout</span>
+            <span class="desc">Logout dan hapus session</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/auth/logout -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"ok"</span>: true }</pre></div>
+          </div>
+        </div>
+
+        <!-- Me -->
+        <div class="endpoint" id="auth-me">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/auth/me</span>
+            <span class="desc">Cek session aktif</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl https://morvo.me/api/auth/me -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span> / <span class="status-badge status-401">401</span></div>
+            <div class="code-block"><pre>{ <span class="key">"user"</span>: { <span class="key">"id"</span>: <span class="string">"usr_..."</span>, <span class="key">"name"</span>: <span class="string">"Budi"</span>, <span class="key">"credits"</span>: 3, <span class="key">"plan"</span>: <span class="string">"free"</span> } }</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ACCOUNT & CREDITS ═══════════ -->
+      <div class="api-section reveal" id="account">
+        <h2><i class="fas fa-wallet"></i> ACCOUNT & CREDITS</h2>
+        <p>Kelola akun, credits, dan plan langganan. Semua endpoint butuh session login.</p>
+
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/account</span>
+            <span class="desc">Info akun, mailbox, dan payments</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"user"</span>: { ... }, <span class="key">"mailboxes"</span>: [...], <span class="key">"payments"</span>: [...] }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="credits">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/credits</span>
+            <span class="desc">Cek credits, plan, dan API key</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"credits"</span>: 3, <span class="key">"plan"</span>: <span class="string">"free"</span>, <span class="key">"apiKey"</span>: null }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="credits-buy">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/credits/buy</span>
+            <span class="desc">Beli credits (Rp 1.000/credit)</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">amount</td><td class="param-type">number</td><td>Jumlah credits <span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/credits/buy \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"amount": 10}'</span> -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"ok"</span>: true, <span class="key">"credits"</span>: 13 }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="plan-upgrade">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/plan/upgrade</span>
+            <span class="desc">Upgrade ke Unlimited 3 bulan (Rp 150.000)</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">plan</td><td class="param-type">string</td><td>"unlimited" <span class="required">REQUIRED</span></td></tr>
+            </table>
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/plan/upgrade \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"plan":"unlimited"}'</span> -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"plan"</span>: <span class="string">"unlimited"</span>, <span class="key">"credits"</span>: 9999, <span class="key">"apiKey"</span>: <span class="string">"tm_abc123..."</span> }</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ MAILBOX ═══════════ -->
+      <div class="api-section reveal" id="mb-create">
+        <h2><i class="fas fa-envelope"></i> MAILBOX</h2>
+        <p>Buat dan kelola email sementara. Setiap pembuatan mailbox menghabiskan 1 credit.</p>
+
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/mailboxes</span>
+            <span class="desc">Buat mailbox baru (-1 credit)</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body (opsional)</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">localPart</td><td class="param-type">string</td><td>Nama custom (random jika kosong)</td></tr>
+            </table>
+            <div class="response-title">Response <span class="status-badge status-201">201</span> / <span class="status-badge status-402">402</span></div>
+            <div class="code-block"><pre><span class="comment">// 402 jika credits habis:</span>
+{ <span class="key">"error"</span>: <span class="string">"Credits habis..."</span>, <span class="key">"code"</span>: <span class="string">"CREDITS_EMPTY"</span> }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="mb-get">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/mailboxes/:id</span>
+            <span class="desc">Detail mailbox</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl https://morvo.me/api/mailboxes/mbx_a1b2c3 -b cookies.txt</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="mb-messages">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/mailboxes/:id/messages</span>
+            <span class="desc">Semua pesan masuk</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl https://morvo.me/api/mailboxes/mbx_a1b2c3/messages -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"messages"</span>: [{ <span class="key">"id"</span>: <span class="string">"msg_..."</span>, <span class="key">"from"</span>: <span class="string">"..."</span>, <span class="key">"subject"</span>: <span class="string">"..."</span>, ... }] }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="mb-send">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/mailboxes/:id/send</span>
+            <span class="desc">Kirim email dari mailbox</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">to</td><td class="param-type">string</td><td>Email tujuan <span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">subject</td><td class="param-type">string</td><td>Judul email <span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">body</td><td class="param-type">string</td><td>Isi pesan <span class="required">REQUIRED</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint" id="mb-sent">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/mailboxes/:id/sent</span>
+            <span class="desc">Riwayat email terkirim</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl https://morvo.me/api/mailboxes/mbx_a1b2c3/sent -b cookies.txt</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ API KEY ═══════════ -->
+      <div class="api-section reveal" id="apikey-get">
+        <h2><i class="fas fa-key"></i> API KEY</h2>
+        <p>Kelola API key untuk automation. Hanya tersedia untuk plan Unlimited.</p>
+
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/apikey</span>
+            <span class="desc">Lihat API key Anda</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"apiKey"</span>: <span class="string">"tm_abc123..."</span>, <span class="key">"hasKey"</span>: true }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="apikey-regen">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/apikey/regenerate</span>
+            <span class="desc">Buat API key baru (key lama mati)</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button>
+              <pre>curl -X POST https://morvo.me/api/apikey/regenerate -b cookies.txt</pre>
+            </div>
+            <div class="response-title">Response <span class="status-badge status-200">200</span></div>
+            <div class="code-block"><pre>{ <span class="key">"apiKey"</span>: <span class="string">"tm_newkey..."</span> }</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ PUBLIC ═══════════ -->
+      <div class="api-section reveal" id="health">
+        <h2><i class="fas fa-globe"></i> PUBLIC ENDPOINTS</h2>
+        <p>Endpoint publik tanpa autentikasi.</p>
+
+        <div class="endpoint open">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/health</span>
+            <span class="desc">Health check</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><pre>{ <span class="key">"ok"</span>: true }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="settings">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method get">GET</span>
+            <span class="path">/api/settings</span>
+            <span class="desc">Pengaturan publik situs</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block"><pre>{ <span class="key">"siteName"</span>: <span class="string">"MORVO TempMail"</span>, <span class="key">"domain"</span>: <span class="string">"adzstore.my.id"</span>, <span class="key">"creditPrice"</span>: 1000, <span class="key">"unlimitedPrice"</span>: 150000, ... }</pre></div>
+          </div>
+        </div>
+
+        <div class="endpoint" id="inbound">
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="path">/api/inbound</span>
+            <span class="desc">Webhook terima email dari SMTP server</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="params-title">Body</div>
+            <table class="param-table">
+              <tr><th>Parameter</th><th>Type</th><th>Keterangan</th></tr>
+              <tr><td class="param-name">to</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">from</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">subject</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">body</td><td class="param-type">string</td><td><span class="required">REQUIRED</span></td></tr>
+              <tr><td class="param-name">html</td><td class="param-type">string</td><td>HTML body (opsional)</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Summary -->
+      <div class="api-section reveal">
+        <h2><i class="fas fa-tag"></i> PRICING</h2>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="plan-name">FREE</div>
+            <div class="plan-price">Rp 0</div>
+            <div class="plan-detail">3 credits saat register<br>❌ No API Key</div>
+          </div>
+          <div class="pricing-card">
+            <div class="plan-name">CREDITS</div>
+            <div class="plan-price">Rp 1.000</div>
+            <div class="plan-detail">per credit<br>❌ No API Key</div>
+          </div>
+          <div class="pricing-card highlight">
+            <div class="plan-name">UNLIMITED</div>
+            <div class="plan-price">Rp 150.000</div>
+            <div class="plan-detail">3 bulan ∞ credits<br>✅ API Key included</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align:center;padding:40px 0 20px;opacity:0.3;">
+        <p style="font-family:var(--cyber);font-size:10px;letter-spacing:3px;color:var(--cyan);">MORVO TEMPMAIL EXPRESS // 2026</p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ═══════════ PARTICLES ═══════════
+    (function() {
+      var container = document.getElementById('particles');
+      for (var i = 0; i < 25; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 8 + 's';
+        p.style.animationDuration = (6 + Math.random() * 6) + 's';
+        var colors = ['var(--cyan)', 'var(--magenta)', 'var(--neon)'];
+        p.style.background = colors[Math.floor(Math.random() * 3)];
+        p.style.width = (1 + Math.random() * 2) + 'px';
+        p.style.height = p.style.width;
+        p.style.boxShadow = '0 0 6px ' + p.style.background;
+        container.appendChild(p);
+      }
+    })();
+
+    // ═══════════ SCROLL PROGRESS BAR ═══════════
+    window.addEventListener('scroll', function() {
+      var scrollTop = window.scrollY;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      document.getElementById('scrollProgress').style.width = progress + '%';
+    });
+
+    // ═══════════ BACK TO TOP ═══════════
+    var backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+      backToTop.classList.toggle('visible', window.scrollY > 400);
+    });
+    backToTop.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ═══════════ INTERSECTION OBSERVER ═══════════
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+    // ═══════════ TOGGLE ENDPOINT ═══════════
+    document.querySelectorAll('.endpoint-header').forEach(function(h) {
+      h.addEventListener('click', function() { h.parentElement.classList.toggle('open'); });
+    });
+
+    // ═══════════ MOBILE SIDEBAR TOGGLE ═══════════
+    document.getElementById('menuToggle').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ═══════════ ACTIVE LINK ON SCROLL ═══════════
+    var links = document.querySelectorAll('.sidebar a[href^="#"]');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var activeFound = false;
+      for (var i = links.length - 1; i >= 0; i--) {
+        var id = links[i].getAttribute('href').slice(1);
+        var el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollPos && !activeFound) {
+          links.forEach(function(l) { l.classList.remove('active'); });
+          links[i].classList.add('active');
+          activeFound = true;
+        }
+      }
+    });
+
+    // ═══════════ COPY BUTTON ═══════════
+    function copyCode(btn) {
+      var pre = btn.parentElement.querySelector('pre');
+      navigator.clipboard.writeText(pre.textContent).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED!';
+        btn.style.color = 'var(--neon)';
+        btn.style.borderColor = 'var(--neon)';
+        setTimeout(function() {
+          btn.textContent = original;
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 2000);
+      });
+    }
+
+    // ═══════════ KEYBOARD SHORTCUTS ═══════════
+    document.addEventListener('keydown', function(e) {
+      // Ctrl+K or / to focus search (future)
+      if (e.key === 'Escape') {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>

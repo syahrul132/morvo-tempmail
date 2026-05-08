@@ -1,1 +1,25 @@
-{"scripts":{"start":"node src/server.js","dev":"node --watch src/server.js","test":"node --test","vercel-build":"node scripts/vercel-build.js"},"dependencies":{"bcryptjs":"^2.4.3","cookie-parser":"^1.4.7","express":"^4.19.2","express-session":"^1.18.0"},"devDependencies":{"supertest":"^7.0.0"},"engines":{"node":"22.x"},"type":"commonjs"}
+{
+  "name": "tempmail-24-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack temporary email prototype for morvo.me with admin settings and ads.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "vercel-build": "node scripts/vercel-build.js"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mailparser": "^3.9.8",
+    "smtp-server": "^3.18.4"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

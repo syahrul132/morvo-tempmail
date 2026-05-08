@@ -1,37 +1,819 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADZ TempMail — adzstore.my.id</title>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MORVO TempMail Express - Email Sementara Cepat & Aman">
+  <meta name="theme-color" content="#0a0a1a">
+  <title>MORVO TempMail Express</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=20260509c">
 </head>
 <body>
-  <nav class="nav"><div class="container nav-inner"><a class="brand" href="/"><span class="logo">A</span><span id="brandName">ADZ TempMail</span></a><div class="nav-links"><a href="#app">Dashboard</a><a href="#pricing">Harga</a><a href="/admin.html">Admin</a></div><button class="btn primary small" onclick="createMailbox()">Buat email</button></div></nav>
-  <header class="hero container">
-    <div id="adHeader" class="ad-slot hide"></div>
-    <div class="badge"><span class="dot"></span><span>Domain temporary: <b>adzstore.my.id</b></span></div>
-    <h1 id="heroTitle">Email sementara gratis 24 jam.</h1>
-    <p id="heroSubtitle">Buat inbox temporary dengan domain adzstore.my.id, terima email, kirim email, dan upgrade unlimited lewat balance.</p>
-    <div class="hero-actions"><button class="btn primary" onclick="createMailbox()">Generate email gratis</button><button class="btn" onclick="simulateInbound()">Simulasi email masuk</button></div>
-  </header>
-  <main class="container">
-    <section id="app" class="app-shell"><div class="app-top"><div class="window-dots"><i></i><i></i><i></i></div><div class="mono">fullstack / express api / json db</div></div><div class="dashboard">
-      <aside class="sidebar">
-        <div id="adSidebar" class="ad-slot hide"></div>
-        <div class="panel"><div class="label"><span>Email aktif</span><span id="planBadge">-</span></div><div id="address" class="address-box">Klik generate email</div><div class="actions-row"><button class="btn small" onclick="copyAddress()">Copy</button><button class="btn small green" onclick="createMailbox()">Refresh baru</button></div></div>
-        <div class="panel"><div class="label"><span>Sisa waktu</span><span id="timer" class="timer">--:--:--</span></div><p class="muted">Plan free aktif sesuai setting admin. Upgrade unlimited agar email permanen.</p><button class="btn orange full" onclick="upgradeMailbox()">Upgrade unlimited</button></div>
-        <div class="panel balance"><div><div class="label"><span>Balance</span></div><strong id="balance">Rp 0</strong></div><button class="btn small primary" onclick="topupMailbox()">Topup demo</button></div>
-        <div class="panel"><div class="label"><span>Endpoint inbound</span><span>API</span></div><p class="muted">POST /api/inbound menerima email dari mail server/webhook ke alamat @adzstore.my.id.</p></div>
-      </aside>
-      <section class="main"><div class="tabs"><button id="tabInbox" class="tab active" onclick="showTab('inbox')">Inbox</button><button id="tabCompose" class="tab" onclick="showTab('compose')">Kirim email</button><button id="tabSent" class="tab" onclick="showTab('sent')">Sent</button></div>
-        <div id="inboxView"><div id="mailList" class="mail-list"></div><article id="reader" class="reader"><h3>Belum ada email dipilih</h3><p>Buat email dulu, lalu pakai simulasi inbound atau POST /api/inbound.</p></article></div>
-        <div id="composeView" class="hide"><div class="panel compose-grid"><label class="field"><span>Dari</span><input id="fromField" readonly></label><label class="field"><span>Ke</span><input id="toField" placeholder="target@example.com"></label><label class="field"><span>Subject</span><input id="subjectField" placeholder="Judul email"></label><label class="field"><span>Pesan</span><textarea id="bodyField" placeholder="Isi pesan..."></textarea></label><button class="btn primary" onclick="sendEmail()">Kirim</button></div></div>
-        <div id="sentView" class="hide"><div id="sentList" class="mail-list"></div></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div id="cyberParticles" aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;"></div>
+
+  <!-- ============================== -->
+  <!-- LANDING PAGE                    -->
+  <!-- ============================== -->
+  <div id="landingPage" class="page page-active">
+
+    <!-- Navbar -->
+    <nav class="landing-nav">
+      <div class="nav-container">
+        <a href="#" class="nav-brand">
+          <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+          <span class="brand-text">MORVO</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features" class="nav-link">Fitur</a>
+          <a href="#pricing" class="nav-link">Harga</a>
+          <button id="btnGoAuth" class="btn btn-primary btn-sm" data-action="showLogin">Masuk / Daftar</button>
+        </div>
+        <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-container">
+        <div class="hero-badge">
+          <i class="fas fa-shield-halved"></i> Privasi Terjamin
+        </div>
+        <h1 class="hero-title">
+          Email Sementara<br>
+          <span class="hero-highlight">Cepat &amp; Aman</span>
+        </h1>
+        <p class="hero-subtitle">
+          Buat alamat email sementara dalam hitungan detik. Lindungi identitas Anda dari spam, pelacakan, dan kebocoran data.
+        </p>
+        <div class="hero-actions">
+          <button id="btnHeroStart" class="btn btn-primary btn-lg" data-action="showRegister">
+            <i class="fas fa-rocket"></i> Mulai Gratis
+          </button>
+          <a href="#features" class="btn btn-ghost btn-lg">
+            <i class="fas fa-info-circle"></i> Pelajari Lebih
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">10K+</span>
+            <span class="hero-stat-label">Pengguna</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">500K+</span>
+            <span class="hero-stat-label">Email Dibuat</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">99.9%</span>
+            <span class="hero-stat-label">Uptime</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">Fitur Unggulan</h2>
+          <p class="section-subtitle">Semua yang Anda butuhkan untuk melindungi privasi online</p>
+        </div>
+        <div class="features-grid">
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h3 class="feature-title">Instan</h3>
+            <p class="feature-desc">Buat alamat email sementara dalam hitungan detik tanpa registrasi rumit.</p>
+          </div>
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-halved"></i>
+            </div>
+            <h3 class="feature-title">Privasi Terjaga</h3>
+            <p class="feature-desc">Data Anda terenkripsi dan tidak dibagikan ke pihak manapun.</p>
+          </div>
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <h3 class="feature-title">Inbox Real-time</h3>
+            <p class="feature-desc">Terima email langsung di dashboard tanpa perlu refresh.</p>
+          </div>
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-paper-plane"></i>
+            </div>
+            <h3 class="feature-title">Kirim Email</h3>
+            <p class="feature-desc">Kirim email anonim langsung dari panel kontrol Anda.</p>
+          </div>
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-code"></i>
+            </div>
+            <h3 class="feature-title">API Tersedia</h3>
+            <p class="feature-desc">Integrasikan MORVO ke aplikasi Anda dengan API kami yang mudah digunakan.</p>
+          </div>
+
+          <div class="feature-card glass-card">
+            <div class="feature-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <h3 class="feature-title">Multi Domain</h3>
+            <p class="feature-desc">Pilih dari berbagai domain untuk alamat email sementara Anda.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">Paket &amp; Harga</h2>
+          <p class="section-subtitle">Pilih paket yang sesuai kebutuhan Anda</p>
+        </div>
+        <div class="pricing-grid">
+
+          <!-- Free Plan -->
+          <div class="pricing-card glass-card">
+            <div class="pricing-header">
+              <span class="pricing-badge">Gratis</span>
+              <h3 class="pricing-name">Free</h3>
+              <div class="pricing-price">
+                <span class="pricing-amount">Rp 0</span>
+              </div>
+              <p class="pricing-desc">Cocok untuk penggunaan sesekali</p>
+            </div>
+            <ul class="pricing-features">
+              <li><i class="fas fa-check"></i> 3 kredit gratis</li>
+              <li><i class="fas fa-check"></i> Buat email sementara</li>
+              <li><i class="fas fa-check"></i> Terima email masuk</li>
+              <li><i class="fas fa-check"></i> Masa aktif 24 jam</li>
+              <li class="pricing-feature-disabled"><i class="fas fa-xmark"></i> Kirim email</li>
+              <li class="pricing-feature-disabled"><i class="fas fa-xmark"></i> Akses API</li>
+            </ul>
+            <button class="btn btn-outline btn-block" data-action="showRegister">Daftar Gratis</button>
+          </div>
+
+          <!-- Premium Plan -->
+          <div class="pricing-card glass-card pricing-card-featured">
+            <div class="pricing-featured-badge">Populer</div>
+            <div class="pricing-header">
+              <span class="pricing-badge pricing-badge-premium">Premium</span>
+              <h3 class="pricing-name">Unlimited</h3>
+              <div class="pricing-price">
+                <span class="pricing-amount">Rp 150.000</span>
+                <span class="pricing-period">/ 3 bulan</span>
+              </div>
+              <p class="pricing-desc">Akses tanpa batas untuk power user</p>
+            </div>
+            <ul class="pricing-features">
+              <li><i class="fas fa-check"></i> Kredit unlimited</li>
+              <li><i class="fas fa-check"></i> Buat email tanpa batas</li>
+              <li><i class="fas fa-check"></i> Kirim email</li>
+              <li><i class="fas fa-check"></i> Masa aktif 7 hari</li>
+              <li><i class="fas fa-check"></i> Akses API penuh</li>
+              <li><i class="fas fa-check"></i> Prioritas dukungan</li>
+            </ul>
+            <button class="btn btn-primary btn-block" data-action="showRegister">Mulai Sekarang</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+          <span class="brand-text">MORVO</span>
+        </div>
+        <p class="footer-copy">&copy; 2026 MORVO TempMail. Hak cipta dilindungi.</p>
+      </div>
+    </footer>
+
+  </div>
+
+
+  <!-- ============================== -->
+  <!-- AUTH PAGE                       -->
+  <!-- ============================== -->
+  <div id="authPage" class="page">
+
+    <div class="auth-wrapper">
+      <div class="auth-card glass-card">
+
+        <!-- Back to landing -->
+        <button id="btnBackLanding" class="auth-back" aria-label="Kembali">
+          <i class="fas fa-arrow-left"></i> Kembali
+        </button>
+
+        <div class="auth-brand">
+          <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+          <span class="brand-text">MORVO</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab auth-tab-active" data-tab="login">Masuk</button>
+          <button class="auth-tab" data-tab="register">Daftar</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" autocomplete="on">
+          <div class="form-group">
+            <label for="loginEmail" class="form-label">Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope input-icon"></i>
+              <input type="email" id="loginEmail" class="form-input" placeholder="email@contoh.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword" class="form-label">Kata Sandi</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="loginPassword" class="form-input" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-sign-in-alt"></i> Masuk
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form auth-form-hidden" autocomplete="on">
+          <div class="form-group">
+            <label for="regName" class="form-label">Nama</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user input-icon"></i>
+              <input type="text" id="regName" class="form-input" placeholder="Nama lengkap" required autocomplete="name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regEmail" class="form-label">Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope input-icon"></i>
+              <input type="email" id="regEmail" class="form-input" placeholder="email@contoh.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regPassword" class="form-label">Kata Sandi</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="regPassword" class="form-input" placeholder="Minimal 6 karakter" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regPasswordConfirm" class="form-label">Konfirmasi Kata Sandi</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Ulangi kata sandi" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-user-plus"></i> Daftar
+          </button>
+        </form>
+
+        <p id="authMessage" class="auth-message"></p>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ============================== -->
+  <!-- DASHBOARD PAGE                  -->
+  <!-- ============================== -->
+  <div id="dashboardPage" class="page">
+
+    <!-- Sidebar Overlay (backdrop) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+          <span class="brand-text">MORVO</span>
+        </div>
+        <button id="sidebarClose" class="sidebar-close" aria-label="Tutup menu">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="#" class="sidebar-link sidebar-link-active" data-view="dashboardView">
+          <i class="fas fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-link" data-view="planView">
+          <i class="fas fa-crown"></i>
+          <span>Plan / Langganan</span>
+        </a>
+
+        <!-- TempMail Submenu -->
+        <div class="sidebar-submenu">
+          <button class="sidebar-link sidebar-submenu-toggle" data-submenu="tempmailSubmenu">
+            <i class="fas fa-envelope"></i>
+            <span>TempMail</span>
+            <i class="fas fa-chevron-down sidebar-submenu-arrow"></i>
+          </button>
+          <div id="tempmailSubmenu" class="sidebar-submenu-items sidebar-submenu-collapsed">
+            <a href="#" class="sidebar-link sidebar-link-sub" data-view="inboxView">
+              <i class="fas fa-inbox"></i>
+              <span>Inbox Masuk</span>
+            </a>
+            <a href="#" class="sidebar-link sidebar-link-sub" data-view="composeView">
+              <i class="fas fa-paper-plane"></i>
+              <span>Kirim Email</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="#" class="sidebar-link" data-view="apikeyView">
+          <i class="fas fa-key"></i>
+          <span>API Key</span>
+          <span class="sidebar-badge">Premium Only</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btnLogout" class="btn btn-outline btn-block sidebar-logout">
+          <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button id="hamburgerBtn" class="topbar-hamburger" aria-label="Buka menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="topbar-brand">
+        <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+        <span class="brand-text">MORVO</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-credits" id="topbarCredits">
+          <i class="fas fa-coins"></i>
+          <span id="creditCount">0</span> Kredit
+        </div>
+        <div class="topbar-email-dropdown-wrap">
+          <button class="topbar-avatar" id="topbarAvatar" aria-label="Profil">
+            <i class="fas fa-user"></i>
+          </button>
+          <div class="topbar-email-dropdown" id="topbarEmailDropdown">
+            <div class="topbar-email-header">
+              <i class="fas fa-envelope"></i> Email Aktif
+            </div>
+            <div class="topbar-email-list" id="topbarEmailList">
+              <div class="topbar-email-empty">Belum ada email</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+
+      <!-- Dashboard View -->
+      <section id="dashboardView" class="view-section view-active">
+        <div class="view-header">
+          <h1 class="view-title">Dashboard</h1>
+          <p class="view-subtitle">Selamat datang kembali!</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card glass-card">
+            <div class="stat-icon stat-icon-credits"><i class="fas fa-coins"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statCredits">0</span>
+              <span class="stat-label">Kredit</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon stat-icon-plan"><i class="fas fa-crown"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statPlan">Free</span>
+              <span class="stat-label">Paket</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon stat-icon-mailboxes"><i class="fas fa-mail-bulk"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statMailboxes">0</span>
+              <span class="stat-label">Total Mailbox</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon stat-icon-messages"><i class="fas fa-envelope-open-text"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statMessages">0</span>
+              <span class="stat-label">Total Pesan</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animated Credit Ring -->
+        <div class="dashboard-ring-row">
+          <div class="credit-ring-card glass-card">
+            <h3 class="card-title"><i class="fas fa-gauge-high"></i> Status Kredit</h3>
+            <div class="ring-wrap">
+              <svg class="ring-svg" viewBox="0 0 120 120">
+                <circle class="ring-bg" cx="60" cy="60" r="52" />
+                <circle class="ring-fill" cx="60" cy="60" r="52" id="creditRing" />
+              </svg>
+              <div class="ring-center">
+                <span class="ring-value" id="ringCreditVal">3</span>
+                <span class="ring-label">/ 10 max</span>
+              </div>
+            </div>
+            <p class="ring-note">Setiap email baru = 1 kredit</p>
+          </div>
+
+          <div class="usage-bars-card glass-card">
+            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Aktivitas</h3>
+            <div class="bar-group">
+              <div class="bar-label"><span>Mailbox</span><span id="barMailboxCount">0</span></div>
+              <div class="bar-track"><div class="bar-fill bar-fill-mb" id="barMailbox"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-label"><span>Pesan</span><span id="barMsgCount">0</span></div>
+              <div class="bar-track"><div class="bar-fill bar-fill-msg" id="barMsg"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-label"><span>Credits Terpakai</span><span id="barCreditUsed">0</span></div>
+              <div class="bar-track"><div class="bar-fill bar-fill-cr" id="barCredit"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <button class="btn btn-primary" id="btnQuickNewMailbox">
+            <i class="fas fa-plus"></i> Buat Email Baru
+          </button>
+          <button class="btn btn-ghost" data-nav-view="inboxView">
+            <i class="fas fa-inbox"></i> Buka Inbox
+          </button>
+        </div>
       </section>
-    </div></section>
-    <section id="pricing"><h2 class="section-title">Free 24 jam, unlimited via balance.</h2><div class="pricing-grid"><div class="price-card"><h3>Free</h3><div class="price">Rp 0 <small>/ email</small></div><p class="muted">Generate alamat @adzstore.my.id, inbox, kirim email, expired otomatis.</p></div><div class="price-card hot"><h3>Unlimited</h3><div class="price" id="priceText">Rp 25.000</div><p class="muted">Bayar dari balance untuk alamat permanen tanpa countdown.</p></div><div class="price-card"><h3>Admin Ads</h3><div class="price">CMS</div><p class="muted">Admin bisa mengatur iklan header/sidebar dari panel admin.</p></div></div></section>
-  </main><div id="toast" class="toast"></div><script src="/app.js"></script>
+
+      <!-- Plan / Subscription View -->
+      <section id="planView" class="view-section">
+        <div class="view-header">
+          <h1 class="view-title">Plan &amp; Langganan</h1>
+          <p class="view-subtitle">Kelola paket dan kredit Anda</p>
+        </div>
+        <div class="plan-cards-grid">
+
+          <!-- Free Plan -->
+          <div class="plan-card glass-card">
+            <div class="plan-card-header">
+              <i class="fas fa-gift plan-card-icon"></i>
+              <h3 class="plan-card-name">Free Plan</h3>
+            </div>
+            <div class="plan-card-price">3 Kredit</div>
+            <p class="plan-card-desc">Kredit awal untuk mencoba layanan</p>
+            <ul class="plan-card-features">
+              <li><i class="fas fa-check"></i> Buat 3 email sementara</li>
+              <li><i class="fas fa-check"></i> Terima pesan masuk</li>
+              <li><i class="fas fa-times"></i> Kirim email</li>
+              <li><i class="fas fa-times"></i> Akses API</li>
+            </ul>
+            <div class="plan-card-action">
+              <span class="plan-current-badge">Paket Saat Ini</span>
+            </div>
+          </div>
+
+          <!-- Buy Credits -->
+          <div class="plan-card glass-card">
+            <div class="plan-card-header">
+              <i class="fas fa-coins plan-card-icon"></i>
+              <h3 class="plan-card-name">Beli Kredit</h3>
+            </div>
+            <div class="plan-card-price">Rp 1.000<span class="plan-price-unit">/kredit</span></div>
+            <p class="plan-card-desc">Bayar sesuai kebutuhan</p>
+            <ul class="plan-card-features">
+              <li><i class="fas fa-check"></i> Beli kredit sesuai kebutuhan</li>
+              <li><i class="fas fa-check"></i> Tanpa langganan</li>
+              <li><i class="fas fa-check"></i> Berlaku selamanya</li>
+            </ul>
+            <div class="plan-card-action">
+              <button class="btn btn-outline btn-block btnBuyCredits">
+                <i class="fas fa-cart-shopping"></i> Beli Kredit
+              </button>
+            </div>
+          </div>
+
+          <!-- Unlimited 3 Months -->
+          <div class="plan-card glass-card plan-card-featured">
+            <div class="plan-featured-tag">Best Value</div>
+            <div class="plan-card-header">
+              <i class="fas fa-crown plan-card-icon plan-card-icon-gold"></i>
+              <h3 class="plan-card-name">Unlimited 3 Bulan</h3>
+            </div>
+            <div class="plan-card-price">Rp 150.000<span class="plan-price-unit">/3 bln</span></div>
+            <p class="plan-card-desc">Akses tanpa batas selama 3 bulan</p>
+            <ul class="plan-card-features">
+              <li><i class="fas fa-check"></i> Kredit unlimited</li>
+              <li><i class="fas fa-check"></i> Kirim & terima email</li>
+              <li><i class="fas fa-check"></i> Akses API penuh</li>
+              <li><i class="fas fa-check"></i> Prioritas dukungan</li>
+            </ul>
+            <div class="plan-card-action">
+              <button class="btn btn-primary btn-block btnUpgradePlan">
+                <i class="fas fa-rocket"></i> Upgrade Sekarang
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Payment History -->
+        <div class="view-header" style="margin-top:2rem">
+          <h1 class="view-title" style="font-size:1.2rem">Riwayat Pembayaran</h1>
+        </div>
+        <div id="paymentHistory" class="glass-card" style="padding:1rem">
+          <p style="color:var(--text-muted);text-align:center">Belum ada riwayat pembayaran</p>
+        </div>
+      </section>
+
+      <!-- Inbox View -->
+      <section id="inboxView" class="view-section">
+        <div class="view-header">
+          <h1 class="view-title">Inbox Masuk</h1>
+          <p class="view-subtitle">Email sementara Anda</p>
+        </div>
+
+        <!-- Active Mailbox -->
+        <div class="inbox-mailbox-bar glass-card">
+          <div class="inbox-mailbox-info">
+            <i class="fas fa-at"></i>
+            <span id="activeMailboxAddr" class="inbox-mailbox-addr">Belum ada mailbox</span>
+            <button id="btnCopyMailbox" class="btn-icon" title="Salin alamat" aria-label="Salin">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="inbox-mailbox-actions">
+            <select id="mailboxSelect" class="form-select form-select-sm">
+              <option value="">-- Pilih Mailbox --</option>
+            </select>
+            <button id="btnNewMailbox" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> Baru
+            </button>
+          </div>
+        </div>
+
+        <div class="inbox-layout">
+          <!-- Mail List -->
+          <div class="inbox-list glass-card">
+            <div class="inbox-list-header">
+              <h3 class="inbox-list-title">Pesan</h3>
+              <button id="btnRefreshInbox" class="btn-icon" title="Refresh" aria-label="Refresh">
+                <i class="fas fa-rotate"></i>
+              </button>
+            </div>
+            <div id="mailList" class="inbox-messages">
+              <div class="inbox-empty">
+                <i class="fas fa-envelope-open"></i>
+                <p>Belum ada pesan</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Reader -->
+          <div class="inbox-reader glass-card">
+            <div id="mailReader" class="inbox-reader-content">
+              <div class="inbox-empty">
+                <i class="fas fa-hand-pointer"></i>
+                <p>Pilih pesan untuk membaca</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Compose View -->
+      <section id="composeView" class="view-section">
+        <div class="view-header">
+          <h1 class="view-title">Kirim Email</h1>
+          <p class="view-subtitle">Kirim email anonim dari akun Anda</p>
+        </div>
+        <div class="compose-card glass-card">
+          <form id="composeForm" class="compose-form">
+            <div class="form-group">
+              <label for="composeFrom" class="form-label">Dari</label>
+              <select id="composeFrom" class="form-select" required>
+                <option value="">-- Pilih alamat pengirim --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="composeTo" class="form-label">Kepada</label>
+              <div class="input-wrapper">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="composeTo" class="form-input" placeholder="tujuan@contoh.com" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="composeSubject" class="form-label">Subjek</label>
+              <div class="input-wrapper">
+                <i class="fas fa-tag input-icon"></i>
+                <input type="text" id="composeSubject" class="form-input" placeholder="Subjek email">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="composeBody" class="form-label">Pesan</label>
+              <textarea id="composeBody" class="form-textarea" rows="8" placeholder="Tulis pesan Anda di sini..." required></textarea>
+            </div>
+            <div class="compose-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Kirim
+              </button>
+              <button type="reset" class="btn btn-ghost">
+                <i class="fas fa-eraser"></i> Bersihkan
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- API Key View -->
+      <section id="apikeyView" class="view-section">
+        <div class="view-header">
+          <h1 class="view-title">API Key</h1>
+          <p class="view-subtitle">Kelola kunci API Anda</p>
+        </div>
+
+        <div class="apikey-notice glass-card">
+          <i class="fas fa-crown"></i>
+          <p>Fitur API Key hanya tersedia untuk pengguna <strong>Premium</strong>.</p>
+        </div>
+
+        <div class="apikey-card glass-card">
+          <div class="apikey-display">
+            <label class="form-label">Kunci API Anda</label>
+            <div class="apikey-field">
+              <code id="apikeyValue" class="apikey-value">••••••••••••••••••••••••••</code>
+              <button id="btnCopyApiKey" class="btn-icon" title="Salin" aria-label="Salin API Key">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <button id="btnRegenApiKey" class="btn btn-outline btn-sm">
+              <i class="fas fa-rotate"></i> Regenerate Key
+            </button>
+          </div>
+        </div>
+
+        <div class="apikey-docs glass-card">
+          <h3 class="apikey-docs-title"><i class="fas fa-book"></i> Dokumentasi API Singkat</h3>
+          <div class="apikey-docs-code">
+            <pre><code id="apiDocsSnippet">// Contoh penggunaan API MORVO TempMail
+
+// 1. Buat mailbox baru
+POST /api/v1/mailbox
+Headers: { "Authorization": "Bearer YOUR_API_KEY" }
+Body: {}
+
+// 2. Ambil daftar pesan
+GET /api/v1/mailbox/{id}/messages
+Headers: { "Authorization": "Bearer YOUR_API_KEY" }
+
+// 3. Baca pesan
+GET /api/v1/messages/{id}
+Headers: { "Authorization": "Bearer YOUR_API_KEY" }
+
+// 4. Kirim email
+POST /api/v1/send
+Headers: { "Authorization": "Bearer YOUR_API_KEY" }
+Body: {
+  "from": "your@mailbox.id",
+  "to": "tujuan@contoh.com",
+  "subject": "Hello",
+  "body": "Pesan Anda"
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ============================== -->
+  <!-- MODALS                          -->
+  <!-- ============================== -->
+
+  <!-- Upgrade Modal -->
+  <div id="upgradeModal" class="modal-overlay modal-hidden" style="display:none">
+    <div class="modal-content glass-card">
+      <button class="modal-close" aria-label="Tutup">&times;</button>
+      <div class="modal-icon modal-icon-warning">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <h2 class="modal-title">Kredit Habis!</h2>
+      <p class="modal-desc">Kredit Anda sudah habis. Upgrade ke paket Premium untuk menikmati akses unlimited.</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary btnUpgradeFromModal">
+          <i class="fas fa-crown"></i> Lihat Paket
+        </button>
+        <button class="btn btn-ghost modal-close-btn">Nanti Saja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Mailbox Modal -->
+  <div id="newMailboxModal" class="modal-overlay modal-hidden" style="display:none">
+    <div class="modal-content glass-card">
+      <button class="modal-close" aria-label="Tutup">&times;</button>
+      <h2 class="modal-title">Buat Email Baru</h2>
+      <p class="modal-desc">Buat alamat email sementara baru. Akan menggunakan 1 kredit.</p>
+      <form id="newMailboxForm" class="modal-form">
+        <div class="form-group">
+          <label for="newMailDomain" class="form-label">Domain</label>
+          <select id="newMailDomain" class="form-select">
+            <option value="">-- Pilih domain --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newMailPrefix" class="form-label">Nama (opsional)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-at input-icon"></i>
+            <input type="text" id="newMailPrefix" class="form-input" placeholder="biarkan kosong untuk random">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fas fa-plus"></i> Buat Mailbox
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Cyberpunk Particles + Ripple Effect -->
+  <script>
+  (function() {
+    // Floating particles
+    var container = document.getElementById('cyberParticles');
+    if (container) {
+      var colors = ['#00ffff','#ff00ff','#39ff14'];
+      for (var i = 0; i < 20; i++) {
+        var p = document.createElement('div');
+        p.style.cssText = 'position:absolute;border-radius:50%;opacity:0;pointer-events:none;' +
+          'left:' + (Math.random()*100) + '%;' +
+          'width:' + (1+Math.random()*2) + 'px;height:' + (1+Math.random()*2) + 'px;' +
+          'background:' + colors[Math.floor(Math.random()*3)] + ';' +
+          'box-shadow:0 0 6px ' + p.style.background + ';' +
+          'animation:cyberFloat ' + (6+Math.random()*6) + 's ease-in-out ' + (Math.random()*8) + 's infinite;';
+        container.appendChild(p);
+      }
+      var style = document.createElement('style');
+      style.textContent = '@keyframes cyberFloat{0%{transform:translateY(100vh) scale(0);opacity:0}20%{opacity:.7}80%{opacity:.2}100%{transform:translateY(-20vh) scale(1.5);opacity:0}}';
+      document.head.appendChild(style);
+    }
+
+    // Button ripple effect
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('.btn');
+      if (!btn) return;
+      var r = document.createElement('span');
+      r.className = 'ripple';
+      var rect = btn.getBoundingClientRect();
+      r.style.left = (e.clientX - rect.left) + 'px';
+      r.style.top = (e.clientY - rect.top) + 'px';
+      r.style.width = r.style.height = Math.max(rect.width, rect.height) + 'px';
+      btn.appendChild(r);
+      setTimeout(function() { r.remove(); }, 700);
+    });
+  })();
+  </script>
+
+  <!-- App Script -->
+  <script src="app.js?v=20260509b"></script>
 </body>
 </html>

@@ -1,16 +1,614 @@
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin — ADZ TempMail</title><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css"></head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MORVO Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous">
+  <style>
+    :root {
+      --bg: #080812;
+      --bg2: rgba(8,8,18,0.96);
+      --bg3: rgba(0,0,0,0.3);
+      --card: rgba(0,255,255,0.02);
+      --border: rgba(0,255,255,0.08);
+      --border-hover: rgba(0,255,255,0.18);
+      --text: #e8e8f8;
+      --text2: #7888a8;
+      --text3: #445570;
+      --accent: #00ffff;
+      --accent2: #00ddee;
+      --accent-soft: rgba(0,255,255,0.1);
+      --magenta: #ff00ff;
+      --magenta-soft: rgba(255,0,255,0.1);
+      --neon: #39ff14;
+      --neon-soft: rgba(57,255,20,0.1);
+      --success: #39ff14;
+      --warning: #ffe600;
+      --danger: #ff3344;
+      --radius: 12px;
+      --font: 'Inter', system-ui, sans-serif;
+      --cyber: 'Orbitron', 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --glow-cyan: 0 0 10px rgba(0,255,255,0.3), 0 0 30px rgba(0,255,255,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    /* CRT Scanlines */
+    body::after { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,255,0.008) 2px,rgba(0,255,255,0.008) 4px); pointer-events:none; z-index:99999; }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(0,255,255,0.15); border-radius:999px; } * { scrollbar-width:thin; scrollbar-color:rgba(0,255,255,0.15) transparent; }
+    ::selection { background:rgba(0,255,255,0.3); color:#fff; }
+
+    /* Animated Grid BG */
+    .bg-grid { position:fixed; inset:0; background-image:linear-gradient(rgba(0,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,255,0.025) 1px,transparent 1px); background-size:60px 60px; animation:gridShift 20s linear infinite; z-index:0; pointer-events:none; }
+    @keyframes gridShift { 0%{transform:perspective(500px) rotateX(1deg) translateY(0)} 100%{transform:perspective(500px) rotateX(1deg) translateY(-60px)} }
+
+    /* Login */
+    .login-wrap { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; position:relative; z-index:1; }
+    .login-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:40px; width:100%; max-width:400px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); position:relative; overflow:hidden; }
+    .login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--magenta),var(--accent)); background-size:200% 100%; animation:rainbowBorder 3s linear infinite; }
+    @keyframes rainbowBorder { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+    .login-card h1 { font-size:24px; margin-bottom:8px; font-family:var(--cyber); letter-spacing:2px; color:var(--accent); }
+    .login-card p { color:var(--text2); font-size:14px; margin-bottom:24px; }
+    .login-card .logo { font-size:24px; font-weight:700; color:var(--accent); margin-bottom:24px; display:flex; align-items:center; gap:10px; font-family:var(--cyber); letter-spacing:3px; text-shadow:var(--glow-cyan); }
+    .login-card .logo i { font-size:22px; animation:brandPulse 2s ease-in-out infinite; }
+    @keyframes brandPulse { 0%,100%{text-shadow:0 0 10px rgba(0,255,255,0.5);transform:scale(1)} 50%{text-shadow:0 0 20px rgba(0,255,255,0.8),0 0 40px rgba(0,255,255,0.3);transform:scale(1.1)} }
+
+    /* Form */
+    .form-group { margin-bottom:16px; }
+    .form-label { display:block; font-size:11px; font-weight:700; color:var(--accent); margin-bottom:6px; font-family:var(--cyber); letter-spacing:1.5px; text-transform:uppercase; }
+    .form-input { width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:var(--font); outline:none; transition:all 0.25s cubic-bezier(.16,1,.3,1); }
+    .form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,255,255,0.1),0 0 15px rgba(0,255,255,0.05); }
+    .form-select { width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:var(--font); outline:none; }
+
+    /* Buttons */
+    .btn { padding:10px 20px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font); transition:all 0.25s cubic-bezier(.16,1,.3,1); display:inline-flex; align-items:center; gap:8px; position:relative; overflow:hidden; }
+    .btn::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 60%); opacity:0; transition:opacity 0.25s; }
+    .btn:hover::after { opacity:1; }
+    .btn:active { transform:scale(0.97); }
+    .btn-primary { background:rgba(0,255,255,0.12); color:var(--accent); border-color:rgba(0,255,255,0.25); box-shadow:0 0 15px rgba(0,255,255,0.1); }
+    .btn-primary:hover { background:rgba(0,255,255,0.2); border-color:var(--accent); box-shadow:0 0 25px rgba(0,255,255,0.2); color:#fff; }
+    .btn-sm { padding:6px 12px; font-size:12px; }
+    .btn-danger { background:rgba(255,51,68,0.12); color:var(--danger); border-color:rgba(255,51,68,0.25); }
+    .btn-danger:hover { background:rgba(255,51,68,0.2); border-color:var(--danger); }
+    .btn-success { background:rgba(57,255,20,0.12); color:var(--success); border-color:rgba(57,255,20,0.25); }
+    .btn-success:hover { background:rgba(57,255,20,0.2); border-color:var(--success); }
+    .btn-warning { background:rgba(255,230,0,0.12); color:var(--warning); border-color:rgba(255,230,0,0.25); }
+    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text2); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+    .btn-block { width:100%; justify-content:center; }
+    .btn-ghost { background:transparent; color:var(--text2); padding:8px 12px; border-color:transparent; }
+    .btn-ghost:hover { color:var(--accent); }
+
+    /* Layout */
+    .admin { display:flex; min-height:100vh; position:relative; z-index:1; }
+    .admin-sidebar { width:240px; background:rgba(8,8,18,0.96); backdrop-filter:blur(20px); border-right:1px solid var(--border); padding:20px 0; flex-shrink:0; display:flex; flex-direction:column; animation:slideInLeft 0.5s cubic-bezier(.16,1,.3,1); }
+    @keyframes slideInLeft { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
+    .admin-sidebar .logo { font-size:16px; font-weight:700; color:var(--accent); padding:0 20px 20px; border-bottom:1px solid var(--border); margin-bottom:12px; font-family:var(--cyber); letter-spacing:3px; text-shadow:var(--glow-cyan); display:flex; align-items:center; gap:10px; }
+    .admin-sidebar .logo i { font-size:20px; animation:brandPulse 2s ease-in-out infinite; }
+    .sidebar-nav { flex:1; }
+    .sidebar-nav a { display:flex; align-items:center; gap:12px; padding:10px 20px; color:var(--text2); text-decoration:none; font-size:14px; transition:all 0.25s cubic-bezier(.16,1,.3,1); border-left:3px solid transparent; position:relative; }
+    .sidebar-nav a::before { content:''; position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg,rgba(0,255,255,0.06),transparent); transition:width 0.3s; }
+    .sidebar-nav a:hover::before { width:100%; }
+    .sidebar-nav a:hover { color:var(--accent); border-left-color:rgba(0,255,255,0.3); }
+    .sidebar-nav a.active { color:var(--accent); background:rgba(0,255,255,0.04); border-left-color:var(--accent); text-shadow:0 0 8px rgba(0,255,255,0.3); }
+    .sidebar-nav a i { width:20px; text-align:center; }
+    .sidebar-footer { padding:12px 20px; border-top:1px solid var(--border); margin-top:auto; }
+    .admin-main { flex:1; padding:24px 32px; overflow-y:auto; }
+
+    /* Header */
+    .page-header { margin-bottom:24px; }
+    .page-header h1 { font-size:20px; font-weight:700; font-family:var(--cyber); color:var(--accent); letter-spacing:2px; text-shadow:0 0 12px rgba(0,255,255,0.15); }
+    .page-header p { color:var(--text2); font-size:14px; margin-top:4px; }
+
+    /* Stats */
+    .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+    .stat-box { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; transition:all 0.25s cubic-bezier(.16,1,.3,1); position:relative; overflow:hidden; }
+    .stat-box::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0; transition:opacity 0.3s; }
+    .stat-box:hover { border-color:var(--border-hover); transform:translateY(-2px); box-shadow:0 4px 20px rgba(0,255,255,0.06); }
+    .stat-box:hover::before { opacity:1; }
+    .stat-box .stat-num { font-size:28px; font-weight:700; font-family:var(--cyber); color:var(--accent); letter-spacing:2px; }
+    .stat-box .stat-lbl { font-size:11px; color:var(--text2); margin-top:4px; font-family:var(--cyber); letter-spacing:1px; text-transform:uppercase; }
+
+    /* Table */
+    .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .table-head { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .table-head h3 { font-size:14px; font-weight:700; font-family:var(--cyber); color:var(--accent); letter-spacing:1.5px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:12px 16px; text-align:left; font-size:13px; border-bottom:1px solid var(--border); }
+    th { color:var(--accent); font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; background:rgba(0,255,255,0.02); font-family:var(--cyber); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:rgba(0,255,255,0.02); }
+
+    /* Badges */
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; font-family:var(--cyber); letter-spacing:0.5px; }
+    .badge-free { background:rgba(120,136,168,0.12); color:var(--text2); border:1px solid rgba(120,136,168,0.15); }
+    .badge-unlimited { background:var(--magenta-soft); color:var(--magenta); border:1px solid rgba(255,0,255,0.15); }
+    .badge-pending { background:rgba(255,230,0,0.1); color:var(--warning); border:1px solid rgba(255,230,0,0.15); }
+    .badge-approved { background:var(--neon-soft); color:var(--success); border:1px solid rgba(57,255,20,0.15); }
+    .badge-rejected { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
+
+    /* Panel */
+    .panel { display:none; animation:fadeUp 0.4s cubic-bezier(.16,1,.3,1); }
+    .panel.active { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Inline edit row */
+    .inline-row { display:flex; gap:8px; align-items:center; }
+    .inline-row input, .inline-row select { max-width:120px; }
+
+    /* Modal */
+    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:1000; }
+    .modal-bg.open { display:flex; }
+    .modal-box { background:rgba(8,8,18,0.96); border:1px solid var(--border); border-radius:var(--radius); padding:28px; width:100%; max-width:480px; position:relative; backdrop-filter:blur(20px); animation:modalEnter 0.35s cubic-bezier(.16,1,.3,1); }
+    @keyframes modalEnter { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
+    .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--magenta),var(--accent)); background-size:200% 100%; animation:rainbowBorder 3s linear infinite; }
+    .modal-box h3 { font-size:16px; margin-bottom:16px; font-family:var(--cyber); color:var(--accent); letter-spacing:1.5px; }
+    .modal-close { position:absolute; top:12px; right:12px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; transition:color 0.2s; }
+    .modal-close:hover { color:var(--accent); }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; background:rgba(8,8,18,0.95); border:1px solid var(--border); border-radius:8px; padding:12px 20px; font-size:13px; color:var(--text); transform:translateY(80px); opacity:0; transition:all 0.4s cubic-bezier(.16,1,.3,1); z-index:9999; backdrop-filter:blur(16px); }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { border-left:3px solid var(--success); box-shadow:0 0 15px rgba(57,255,20,0.1); }
+    .toast.error { border-left:3px solid var(--danger); box-shadow:0 0 15px rgba(255,51,68,0.1); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin { flex-direction:column; }
+      .admin-sidebar { width:100%; flex-direction:row; padding:10px 0; overflow-x:auto; }
+      .admin-sidebar .logo { padding:0 12px; border-bottom:none; border-right:1px solid var(--border); margin-bottom:0; white-space:nowrap; padding-right:16px; }
+      .sidebar-nav { display:flex; overflow-x:auto; }
+      .sidebar-nav a { border-left:none; border-bottom:3px solid transparent; white-space:nowrap; padding:8px 14px; }
+      .sidebar-nav a.active { border-bottom-color:var(--accent); }
+      .sidebar-footer { display:none; }
+      .admin-main { padding:16px; }
+      table { font-size:12px; }
+      th, td { padding:8px 10px; }
+    }
+  </style>
+</head>
 <body>
-<nav class="nav"><div class="container nav-inner"><a class="brand" href="/"><span class="logo">A</span><span>Admin ADZ TempMail</span></a><div class="nav-links"><a href="/">Website</a></div><button class="btn small danger" onclick="logout()">Logout</button></div></nav>
-<main class="container admin-page">
-  <section id="loginPanel" class="auth-card"><h1>Login Admin</h1><p class="muted">Default: admin / admin123. Ganti password setelah deploy.</p><label class="field"><span>Username</span><input id="loginUser" value="admin"></label><label class="field"><span>Password</span><input id="loginPass" type="password" value="admin123"></label><button class="btn primary full" onclick="login()">Login</button></section>
-  <section id="adminPanel" class="hide"><div class="admin-grid">
-    <div class="panel"><h2>Setting Website</h2><label class="field"><span>Nama website</span><input id="siteName"></label><label class="field"><span>Hero title</span><input id="heroTitle"></label><label class="field"><span>Hero subtitle</span><textarea id="heroSubtitle"></textarea></label><label class="field"><span>Free hours</span><input id="freeHours" type="number"></label><label class="field"><span>Harga unlimited</span><input id="unlimitedPrice" type="number"></label><label class="check"><input id="allowSending" type="checkbox"> Izinkan kirim email</label><label class="field"><span>SMTP mode</span><select id="smtpMode"><option value="demo">Demo record only</option><option value="queued">Queued for SMTP worker</option></select></label><button class="btn primary" onclick="saveSettings()">Simpan setting</button></div>
-    <div class="panel"><h2>Tambah / Update Ads</h2><input id="adId" type="hidden"><label class="field"><span>Slot</span><select id="adSlot"><option value="header">header</option><option value="sidebar">sidebar</option><option value="pricing">pricing</option></select></label><label class="field"><span>Judul</span><input id="adTitle"></label><label class="field"><span>Body</span><textarea id="adBody"></textarea></label><label class="field"><span>URL</span><input id="adUrl" placeholder="https://..."></label><label class="field"><span>Image URL optional</span><input id="adImageUrl"></label><label class="check"><input id="adActive" type="checkbox" checked> Aktif</label><div class="actions-row"><button class="btn green" onclick="saveAd()">Simpan ads</button><button class="btn" onclick="resetAdForm()">Reset</button></div></div>
-    <div class="panel wide"><h2>Daftar Ads</h2><div id="adsList" class="mail-list"></div></div>
-    <div class="panel wide"><h2>Mailbox & Statistik</h2><div id="stats" class="stats compact"></div><div id="mailboxes" class="mail-list"></div></div>
-    <div class="panel wide"><h2>Ganti Admin</h2><label class="field"><span>Username baru</span><input id="newUsername" placeholder="admin"></label><label class="field"><span>Password baru</span><input id="newPassword" type="password" placeholder="minimal kuatkan sendiri"></label><button class="btn orange" onclick="changePassword()">Update admin</button></div>
-  </div></section>
-</main><div id="toast" class="toast"></div><script src="/admin.js"></script>
-</body></html>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <span class="logo"><i class="fas fa-shield-halved"></i>MORVO Admin</span>
+      <h1>Masuk</h1>
+      <p>Masukkan kredensial admin untuk melanjutkan</p>
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="adminUser" class="form-input" placeholder="admin" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="adminPass" class="form-input" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminApp" class="admin" style="display:none">
+    <aside class="admin-sidebar">
+      <div class="logo"><i class="fas fa-shield-halved"></i>MORVO</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" data-panel="dashboardPanel"><i class="fas fa-chart-pie"></i>Dashboard</a>
+        <a href="#" data-panel="usersPanel"><i class="fas fa-users"></i>Pengguna</a>
+        <a href="#" data-panel="mailboxesPanel"><i class="fas fa-envelope"></i>Mailbox</a>
+        <a href="#" data-panel="paymentsPanel"><i class="fas fa-credit-card"></i>Pembayaran</a>
+        <a href="#" data-panel="settingsPanel"><i class="fas fa-gear"></i>Pengaturan</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-block" id="adminLogout"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <!-- Dashboard Panel -->
+      <div id="dashboardPanel" class="panel active">
+        <div class="page-header"><h1>Dashboard</h1><p>Ringkasan sistem MORVO TempMail</p></div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-num" id="dTotalUsers">0</div><div class="stat-lbl">Total Pengguna</div></div>
+          <div class="stat-box"><div class="stat-num" id="dTotalMailboxes">0</div><div class="stat-lbl">Total Mailbox</div></div>
+          <div class="stat-box"><div class="stat-num" id="dTotalMessages">0</div><div class="stat-lbl">Total Pesan</div></div>
+          <div class="stat-box"><div class="stat-num" id="dPremiumUsers">0</div><div class="stat-lbl">Premium Users</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>Pengguna Terbaru</h3></div>
+          <table><thead><tr><th>Nama</th><th>Email</th><th>Credits</th><th>Plan</th><th>Terdaftar</th></tr></thead><tbody id="dRecentUsers"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Users Panel -->
+      <div id="usersPanel" class="panel">
+        <div class="page-header"><h1>Pengguna</h1><p>Kelola semua akun pengguna</p></div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>Daftar Pengguna</h3></div>
+          <table><thead><tr><th>Nama</th><th>Email</th><th>Credits</th><th>Plan</th><th>API Key</th><th>Aksi</th></tr></thead><tbody id="usersTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Mailboxes Panel -->
+      <div id="mailboxesPanel" class="panel">
+        <div class="page-header"><h1>Mailbox</h1><p>Kelola semua mailbox aktif</p></div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>Daftar Mailbox</h3></div>
+          <table><thead><tr><th>Alamat</th><th>Pemilik</th><th>Plan</th><th>Dibuat</th><th>Expired</th><th>Aksi</th></tr></thead><tbody id="mailboxesTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Payments Panel -->
+      <div id="paymentsPanel" class="panel">
+        <div class="page-header"><h1>Pembayaran</h1><p>Approve dan kelola pembayaran</p></div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>Daftar Pembayaran</h3></div>
+          <table><thead><tr><th>ID</th><th>Pengguna</th><th>Tipe</th><th>Nominal</th><th>Metode</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody id="paymentsTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div id="settingsPanel" class="panel">
+        <div class="page-header"><h1>Pengaturan</h1><p>Konfigurasi sistem</p></div>
+        <div class="table-wrap" style="padding:20px">
+          <form id="settingsForm">
+            <div class="form-group"><label class="form-label">Nama Situs</label><input type="text" id="sSiteName" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Harga per Credit (Rp)</label><input type="number" id="sCreditPrice" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Harga Unlimited 3 Bulan (Rp)</label><input type="number" id="sUnlimitedPrice" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Jam Aktif Free Plan</label><input type="number" id="sFreeHours" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Hero Title</label><input type="text" id="sHeroTitle" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Hero Subtitle</label><input type="text" id="sHeroSubtitle" class="form-input"></div>
+            <div class="form-group"><label class="form-label">SMTP Mode</label><select id="sSmtpMode" class="form-select"><option value="real">Real</option><option value="queued">Queued</option></select></div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan</button>
+          </form>
+          <hr style="border-color:var(--border);margin:24px 0">
+          <h3 style="margin-bottom:16px">Ubah Password Admin</h3>
+          <form id="passwordForm">
+            <div class="form-group"><label class="form-label">Username Baru</label><input type="text" id="sAdminUser" class="form-input" placeholder="admin"></div>
+            <div class="form-group"><label class="form-label">Password Baru</label><input type="password" id="sAdminPass" class="form-input" placeholder="Kosongkan jika tidak diubah"></div>
+            <button type="submit" class="btn btn-warning"><i class="fas fa-key"></i> Update Password</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="editUserModal" class="modal-bg">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
+      <h3>Edit Pengguna</h3>
+      <form id="editUserForm">
+        <input type="hidden" id="euId">
+        <div class="form-group"><label class="form-label">Nama</label><input type="text" id="euName" class="form-input" readonly></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="text" id="euEmail" class="form-input" readonly></div>
+        <div class="form-group"><label class="form-label">Tambah Credits</label><input type="number" id="euCredits" class="form-input" value="0" min="0"></div>
+        <div class="form-group"><label class="form-label">Ubah Plan</label><select id="euPlan" class="form-select"><option value="">-- Tidak Diubah --</option><option value="free">Free</option><option value="unlimited">Unlimited</option></select></div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
+          <button type="button" class="btn btn-outline" onclick="closeModal('editUserModal')">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ─── Helpers ──────────────────────────────
+    async function api(method, url, body) {
+      var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin' };
+      if (body) opts.body = JSON.stringify(body);
+      var res = await fetch(url, opts);
+      var data = await res.json().catch(function() { return {}; });
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    function showToast(msg, type) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast show ' + (type || 'success');
+      setTimeout(function() { el.className = 'toast'; }, 3000);
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '-';
+      var d = new Date(iso);
+      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatRp(n) {
+      return 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+    }
+
+    function $(id) { return document.getElementById(id); }
+
+    // ─── State ────────────────────────────────
+    var state = { users: [], mailboxes: [], payments: [], settings: {} };
+
+    // ─── Panel Switching ──────────────────────
+    document.querySelectorAll('.sidebar-nav a[data-panel]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-nav a').forEach(function(x) { x.classList.remove('active'); });
+        a.classList.add('active');
+        document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+        var panel = document.getElementById(a.dataset.panel);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // ─── Login ────────────────────────────────
+    $('adminLoginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/admin/login', { username: $('adminUser').value, password: $('adminPass').value });
+        $('loginScreen').style.display = 'none';
+        $('adminApp').style.display = 'flex';
+        loadState();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // ─── Logout ───────────────────────────────
+    $('adminLogout').addEventListener('click', async function() {
+      await api('POST', '/api/admin/logout').catch(function() {});
+      location.reload();
+    });
+
+    // ─── Load State ───────────────────────────
+    async function loadState() {
+      try {
+        var data = await api('GET', '/api/admin/state');
+        state.users = data.users || [];
+        state.mailboxes = data.mailboxes || [];
+        state.payments = data.payments || [];
+        state.settings = data.settings || {};
+        renderAll();
+      } catch (err) {
+        showToast('Gagal memuat data', 'error');
+      }
+    }
+
+    // ─── Render ───────────────────────────────
+    function renderAll() {
+      renderDashboard();
+      renderUsers();
+      renderMailboxes();
+      renderPayments();
+      renderSettings();
+    }
+
+    function renderDashboard() {
+      var users = state.users;
+      $('dTotalUsers').textContent = users.length;
+      $('dTotalMailboxes').textContent = state.mailboxes.length;
+      $('dTotalMessages').textContent = (state.messages || []).length || '—';
+      $('dPremiumUsers').textContent = users.filter(function(u) { return u.plan === 'unlimited'; }).length;
+
+      var tbody = $('dRecentUsers');
+      tbody.innerHTML = '';
+      users.slice(0, 10).forEach(function(u) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + esc(u.name) + '</td>' +
+          '<td>' + esc(u.email) + '</td>' +
+          '<td>' + (u.credits || 0) + '</td>' +
+          '<td><span class="badge badge-' + (u.plan || 'free') + '">' + (u.plan || 'free') + '</span></td>' +
+          '<td>' + fmtDate(u.createdAt) + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderUsers() {
+      var tbody = $('usersTable');
+      tbody.innerHTML = '';
+      state.users.forEach(function(u) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + esc(u.name) + '</td>' +
+          '<td>' + esc(u.email) + '</td>' +
+          '<td>' + (u.credits || 0) + '</td>' +
+          '<td><span class="badge badge-' + (u.plan || 'free') + '">' + (u.plan || 'free') + '</span></td>' +
+          '<td>' + (u.apiKey ? '<code style="font-size:11px;color:var(--accent)">' + u.apiKey.slice(0, 12) + '…</code>' : '<span style="color:var(--text3)">—</span>') + '</td>' +
+          '<td class="inline-row">' +
+            '<button class="btn btn-sm btn-outline" onclick="editUser(\'' + u.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.id + '\',\'' + esc(u.email) + '\')"><i class="fas fa-trash"></i></button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMailboxes() {
+      var tbody = $('mailboxesTable');
+      tbody.innerHTML = '';
+      state.mailboxes.forEach(function(m) {
+        var owner = state.users.find(function(u) { return u.id === m.userId; });
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><code style="color:var(--accent)">' + esc(m.address) + '</code></td>' +
+          '<td>' + (owner ? esc(owner.email) : '<span style="color:var(--text3)">Anonim</span>') + '</td>' +
+          '<td><span class="badge badge-' + (m.plan || 'free') + '">' + (m.plan || 'free') + '</span></td>' +
+          '<td>' + fmtDate(m.createdAt) + '</td>' +
+          '<td>' + (m.expiresAt ? fmtDate(m.expiresAt) : '∞') + '</td>' +
+          '<td><button class="btn btn-sm btn-danger" onclick="deleteMailbox(\'' + m.id + '\',\'' + esc(m.address) + '\')"><i class="fas fa-trash"></i></button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPayments() {
+      var tbody = $('paymentsTable');
+      tbody.innerHTML = '';
+      if (!state.payments || state.payments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:20px">Belum ada pembayaran</td></tr>';
+        return;
+      }
+      var typeLabels = { credits: 'Beli Kredit', upgrade: 'Upgrade Unlimited' };
+      state.payments.forEach(function(p) {
+        var user = state.users.find(function(u) { return u.id === p.userId; });
+        var creditNote = (p.type === 'credits' && p.metadata && p.metadata.creditAmount) ? ' (' + p.metadata.creditAmount + ' kredit)' : '';
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><code style="font-size:11px">' + (p.id || '').slice(0, 16) + '</code></td>' +
+          '<td>' + (user ? esc(user.email) : p.userId) + '</td>' +
+          '<td>' + esc(typeLabels[p.type] || p.type || '-') + creditNote + '</td>' +
+          '<td>' + formatRp(p.amount) + '</td>' +
+          '<td>' + esc(p.method || '-') + '</td>' +
+          '<td><span class="badge badge-' + (p.status || 'pending') + '">' + (p.status || 'pending') + '</span></td>' +
+          '<td>' + fmtDate(p.createdAt) + '</td>' +
+          '<td>' + (p.status === 'pending'
+            ? '<button class="btn btn-sm btn-success" onclick="approvePayment(\'' + p.id + '\')"><i class="fas fa-check"></i> Approve</button> '
+            + '<button class="btn btn-sm btn-danger" onclick="rejectPayment(\'' + p.id + '\')"><i class="fas fa-times"></i> Tolak</button>'
+            : (p.status === 'approved'
+              ? '<span style="color:var(--success)">✓ Disetujui</span>'
+              : '<span style="color:var(--danger)">✗ Ditolak</span>'))
+          + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderSettings() {
+      var s = state.settings;
+      $('sSiteName').value = s.siteName || '';
+      $('sCreditPrice').value = s.creditPrice || 1000;
+      $('sUnlimitedPrice').value = s.unlimitedPrice || 150000;
+      $('sFreeHours').value = s.freeHours || 24;
+      $('sHeroTitle').value = s.heroTitle || '';
+      $('sHeroSubtitle').value = s.heroSubtitle || '';
+      $('sSmtpMode').value = s.smtpMode || 'real';
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      var d = document.createElement('div');
+      d.appendChild(document.createTextNode(s));
+      return d.innerHTML;
+    }
+
+    // ─── Actions ──────────────────────────────
+    window.editUser = function(id) {
+      var u = state.users.find(function(x) { return x.id === id; });
+      if (!u) return;
+      $('euId').value = u.id;
+      $('euName').value = u.name;
+      $('euEmail').value = u.email;
+      $('euCredits').value = 0;
+      $('euPlan').value = '';
+      $('editUserModal').classList.add('open');
+    };
+
+    window.closeModal = function(id) {
+      $(id).classList.remove('open');
+    };
+
+    $('editUserForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var id = $('euId').value;
+      var credits = parseInt($('euCredits').value, 10) || 0;
+      var plan = $('euPlan').value;
+      try {
+        if (credits > 0) {
+          await api('POST', '/api/admin/users/' + id + '/credits', { amount: credits });
+          showToast('Credits berhasil ditambahkan: +' + credits);
+        }
+        if (plan) {
+          await api('POST', '/api/admin/users/' + id + '/plan', { plan: plan });
+          showToast('Plan berhasil diubah ke ' + plan);
+        }
+        if (!credits && !plan) {
+          showToast('Tidak ada perubahan', 'error');
+          return;
+        }
+        closeModal('editUserModal');
+        loadState();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    window.deleteUser = function(id, email) {
+      if (!confirm('Hapus pengguna ' + email + '? Semua mailbox-nya juga akan tidak punya pemilik.')) return;
+      api('DELETE', '/api/admin/users/' + id).then(function() {
+        showToast('Pengguna dihapus');
+        loadState();
+      }).catch(function(err) { showToast(err.message, 'error'); });
+    };
+
+    window.deleteMailbox = function(id, addr) {
+      if (!confirm('Hapus mailbox ' + addr + '? Semua pesan di dalamnya akan hilang.')) return;
+      api('DELETE', '/api/admin/mailboxes/' + id).then(function() {
+        showToast('Mailbox dihapus');
+        loadState();
+      }).catch(function(err) { showToast(err.message, 'error'); });
+    };
+
+    window.approvePayment = function(id) {
+      if (!confirm('Setujui pembayaran ini? Kredit/plan akan langsung aktif.')) return;
+      api('POST', '/api/admin/payments/' + id + '/approve').then(function() {
+        showToast('Pembayaran disetujui! Kredit/plan sudah aktif.');
+        loadState();
+      }).catch(function(err) { showToast(err.message, 'error'); });
+    };
+
+    window.rejectPayment = function(id) {
+      if (!confirm('Tolak pembayaran ini?')) return;
+      api('POST', '/api/admin/payments/' + id + '/reject').then(function() {
+        showToast('Pembayaran ditolak');
+        loadState();
+      }).catch(function(err) { showToast(err.message, 'error'); });
+    };
+
+    $('settingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      try {
+        await api('PUT', '/api/admin/settings', {
+          siteName: $('sSiteName').value,
+          creditPrice: parseInt($('sCreditPrice').value, 10),
+          unlimitedPrice: parseInt($('sUnlimitedPrice').value, 10),
+          freeHours: parseInt($('sFreeHours').value, 10),
+          heroTitle: $('sHeroTitle').value,
+          heroSubtitle: $('sHeroSubtitle').value,
+          smtpMode: $('sSmtpMode').value
+        });
+        showToast('Pengaturan disimpan');
+        loadState();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    $('passwordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var payload = {};
+      if ($('sAdminUser').value) payload.username = $('sAdminUser').value;
+      if ($('sAdminPass').value) payload.password = $('sAdminPass').value;
+      if (!Object.keys(payload).length) return showToast('Isi minimal satu field', 'error');
+      try {
+        await api('PUT', '/api/admin/password', payload);
+        showToast('Password admin diperbarui');
+        $('sAdminPass').value = '';
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // ─── Boot ─────────────────────────────────
+    api('GET', '/api/admin/me').then(function() {
+      $('loginScreen').style.display = 'none';
+      $('adminApp').style.display = 'flex';
+      loadState();
+    }).catch(function() {
+      $('loginScreen').style.display = 'flex';
+      $('adminApp').style.display = 'none';
+    });
+
+  })();
+  </script>
+</body>
+</html>

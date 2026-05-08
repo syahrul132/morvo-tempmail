@@ -3,29 +3,30 @@ const path = require('node:path');
 const bcrypt = require('bcryptjs');
 
 const DEFAULT_DOMAIN = 'adzstore.my.id';
-const DEFAULT_ADMIN_PASSWORD_HASH = bcrypt.hashSync('admin123', 10);
+const DEFAULT_ADMIN_PASSWORD_HASH = bcrypt.hashSync('MorvoAdmin2026!', 10);
 
 function defaultData() {
   return {
     settings: {
-      siteName: 'ADZ TempMail',
+      siteName: 'MORVO TempMail',
       domain: DEFAULT_DOMAIN,
       freeHours: 24,
-      unlimitedPrice: 25000,
+      creditPrice: 1000,
+      unlimitedPrice: 150000,
+      unlimitedDurationDays: 90,
       allowSending: true,
       adminUsername: 'admin',
       adminPasswordHash: DEFAULT_ADMIN_PASSWORD_HASH,
-      heroTitle: 'Email sementara gratis 24 jam.',
-      heroSubtitle: 'Buat inbox temporary dengan domain adzstore.my.id, terima email, kirim email, dan upgrade unlimited lewat balance.',
-      smtpMode: 'demo'
+      heroTitle: 'Email sementara yang cepat, privat, dan siap menerima pesan asli.',
+      heroSubtitle: 'Buat inbox temporary, terima email penuh, kelola saldo, dan upgrade alamat menjadi unlimited.',
+      smtpMode: 'real'
     },
     mailboxes: [],
     messages: [],
     sent: [],
-    ads: [
-      { id: 'ad-header-demo', slot: 'header', title: 'Pasang iklan di ADZ TempMail', body: 'Slot header bisa diatur dari admin panel.', url: 'https://adzstore.my.id', active: true, createdAt: new Date().toISOString() },
-      { id: 'ad-sidebar-demo', slot: 'sidebar', title: 'Promo Digital Product', body: 'Iklan sidebar untuk affiliate, hosting, panel, atau toko digital.', url: 'https://adzstore.my.id', active: true, createdAt: new Date().toISOString() }
-    ]
+    users: [],
+    payments: [],
+    ads: []
   };
 }
 
@@ -33,8 +34,17 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function migrateUser(user) {
+  if (user.credits === undefined) user.credits = user.plan === 'unlimited' ? 9999 : 3;
+  if (!user.plan) user.plan = 'free';
+  if (user.apiKey === undefined) user.apiKey = null;
+  if (user.balance === undefined) user.balance = 0;
+  return user;
+}
+
 function createMemoryStore(initial = defaultData()) {
   let data = clone(initial);
+  data.users = (data.users || []).map(migrateUser);
   return {
     get data() { return data; },
     read() { return clone(data); },
@@ -46,6 +56,19 @@ function createMemoryStore(initial = defaultData()) {
 function createFileStore(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify(defaultData(), null, 2));
+  else {
+    const current = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    current.users ||= [];
+    current.payments ||= [];
+    current.ads ||= [];
+    current.settings ||= defaultData().settings;
+    current.settings.domain = DEFAULT_DOMAIN;
+    current.settings.smtpMode = current.settings.smtpMode === 'queued' ? 'queued' : 'real';
+    if (current.settings.creditPrice === undefined) current.settings.creditPrice = 1000;
+    if (current.settings.unlimitedDurationDays === undefined) current.settings.unlimitedDurationDays = 90;
+    current.users = current.users.map(migrateUser);
+    fs.writeFileSync(filePath, JSON.stringify(current, null, 2));
+  }
   return {
     read() { return JSON.parse(fs.readFileSync(filePath, 'utf8')); },
     write(next) { fs.writeFileSync(filePath, JSON.stringify(next, null, 2)); return this.read(); },
