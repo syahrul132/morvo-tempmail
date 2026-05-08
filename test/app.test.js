@@ -15,7 +15,7 @@ async function loginUser(app, email = `user${Math.random().toString(16).slice(2)
   return agent;
 }
 
-test('creates a free 24-hour mailbox on adzstore.my.id', async () => {
+test('creates a free 24-hour mailbox on morvo.me', async () => {
   const { app } = makeApp();
   const agent = await loginUser(app);
   const res = await agent.post('/api/mailboxes').send({ prefix: 'demo' }).expect(201);
@@ -116,7 +116,7 @@ test('admin-created active ads appear in public settings by slot and override ol
   const agent = request.agent(app);
   await agent.post('/api/admin/login').send({ username: 'admin', password: 'admin123' }).expect(200);
   await agent.post('/api/admin/ads').send({ slot: 'header', title: 'Iklan Lama', body: 'lama', url: 'https://old.example', active: true }).expect(201);
-  await agent.post('/api/admin/ads').send({ slot: 'header', title: 'Promo ADZ', body: 'Topup murah', url: 'https://adzstore.my.id', active: true }).expect(201);
+  await agent.post('/api/admin/ads').send({ slot: 'header', title: 'Promo ADZ', body: 'Topup murah', url: 'https://morvo.me', active: true }).expect(201);
   const settings = await request(app).get('/api/settings').expect(200);
   assert.equal(settings.body.ads.header.title, 'Promo ADZ');
 });

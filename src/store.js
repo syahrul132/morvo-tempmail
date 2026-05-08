@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const bcrypt = require('bcryptjs');
 
-const DEFAULT_DOMAIN = 'adzstore.my.id';
+const DEFAULT_DOMAIN = 'morvo.me';
 const DEFAULT_ADMIN_PASSWORD_HASH = bcrypt.hashSync('MorvoAdmin2026!', 10);
 
 function defaultData() {

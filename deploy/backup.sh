@@ -76,8 +76,8 @@ OS: Ubuntu 22.04+ (x86_64)
 # DNS records needed:
 #   morvo.me          A      -> YOUR_SERVER_IP
 #   www.morvo.me      A      -> YOUR_SERVER_IP
-#   adzstore.my.id    MX     -> 10 mail.adzstore.my.id
-#   mail.adzstore.my.id  A   -> YOUR_SERVER_IP
+#   morvo.me          MX     -> 10 mail.morvo.me
+#   mail.morvo.me         A   -> YOUR_SERVER_IP
 ENVEOF
 
 # 6. Git history

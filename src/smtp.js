@@ -67,7 +67,7 @@ function storeParsedMessage(store, recipient, parsed, rawSource, session) {
 
 function startSmtpServer({ store, port = 25, host = '0.0.0.0' }) {
   const server = new SMTPServer({
-    name: 'mail.adzstore.my.id',
+    name: 'mail.morvo.me',
     authOptional: true,
     disabledCommands: ['AUTH'],
     size: 25 * 1024 * 1024,
@@ -107,7 +107,7 @@ function startSmtpServer({ store, port = 25, host = '0.0.0.0' }) {
   });
 
   server.listen(port, host, () => {
-    console.log(`SMTP inbound server listening on ${host}:${port} for adzstore.my.id`);
+    console.log(`SMTP inbound server listening on ${host}:${port} for morvo.me`);
   });
 
   return server;

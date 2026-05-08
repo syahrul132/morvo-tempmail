@@ -14,7 +14,7 @@ const app = createApp({
 
 app.listen(PORT, () => {
   console.log(`MORVO TempMail running on http://127.0.0.1:${PORT}`);
-  console.log(`Temp mail domain: adzstore.my.id`);
+  console.log(`Temp mail domain: morvo.me`);
   console.log(`Admin: /admin username=admin`);
 });
 

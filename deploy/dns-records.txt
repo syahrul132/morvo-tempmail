@@ -1,13 +1,16 @@
-# DNS Records Required for MORVO TempMail
+# DNS Records Required for MORVO TempMail (SWAPPED)
 # Configure these at your domain registrar / DNS provider
+#
+# Website = adzstore.my.id
+# Email domain = morvo.me
 
-# Website
-morvo.me          A      YOUR_SERVER_IP
-www.morvo.me      A      YOUR_SERVER_IP
+# Website (adzstore.my.id)
+adzstore.my.id          A      YOUR_SERVER_IP
+www.adzstore.my.id      A      YOUR_SERVER_IP
 
-# TempMail domain (where temporary emails are received)
-adzstore.my.id    MX     10 mail.adzstore.my.id
-mail.adzstore.my.id  A   YOUR_SERVER_IP
+# TempMail domain - morvo.me (where temporary emails are received)
+morvo.me                MX     10 mail.morvo.me
+mail.morvo.me           A      YOUR_SERVER_IP
 
-# SPF (optional but recommended for deliverability)
-adzstore.my.id    TXT    "v=spf1 ip4:YOUR_SERVER_IP ~all"
+# SPF (recommended for deliverability)
+morvo.me                TXT    "v=spf1 ip4:YOUR_SERVER_IP ~all"

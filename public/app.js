@@ -888,10 +888,10 @@
       if (domainSelect) {
         domainSelect.innerHTML = '<option value="">Loading...</option>';
         api('GET', '/api/settings').then(function(s) {
-          var domain = s.domain || 'adzstore.my.id';
+          var domain = s.domain || 'morvo.me';
           domainSelect.innerHTML = '<option value="' + domain + '">@' + domain + '</option>';
         }).catch(function() {
-          domainSelect.innerHTML = '<option value="adzstore.my.id">@adzstore.my.id</option>';
+          domainSelect.innerHTML = '<option value="morvo.me">@morvo.me</option>';
         });
       }
     }
