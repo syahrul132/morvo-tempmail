@@ -396,6 +396,68 @@
       </div>
     </header>
 
+    <!-- Credits Slide Panel -->
+    <div class="credits-panel-overlay" id="creditsPanelOverlay"></div>
+    <div class="credits-panel" id="creditsPanel">
+      <div class="credits-panel-header">
+        <div class="credits-panel-title">
+          <i class="fas fa-coins"></i>
+          <span>Top Up Kredit</span>
+        </div>
+        <button class="credits-panel-close" id="creditsPanelClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="credits-panel-body">
+        <div class="credits-panel-balance">
+          <div class="credits-panel-balance-label">Saldo Kredit</div>
+          <div class="credits-panel-balance-value" id="creditsPanelBalance">0</div>
+        </div>
+
+        <div class="credits-panel-section">
+          <label class="credits-panel-label">Jumlah Kredit</label>
+          <div class="credits-slider-wrap">
+            <input type="range" class="credits-slider" id="creditsSlider" min="1" max="100" value="10">
+            <div class="credits-slider-input-wrap">
+              <button class="credits-slider-btn" id="creditsMinus">−</button>
+              <input type="number" class="credits-slider-input" id="creditsInput" min="1" max="100" value="10">
+              <button class="credits-slider-btn" id="creditsPlus">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="credits-panel-presets">
+          <button class="credits-preset" data-amount="1">1</button>
+          <button class="credits-preset" data-amount="5">5</button>
+          <button class="credits-preset" data-amount="10">10</button>
+          <button class="credits-preset" data-amount="25">25</button>
+          <button class="credits-preset" data-amount="50">50</button>
+          <button class="credits-preset" data-amount="100">100</button>
+        </div>
+
+        <div class="credits-panel-summary">
+          <div class="credits-summary-row">
+            <span>Harga per kredit</span>
+            <span id="creditsPriceEach">Rp 1.000</span>
+          </div>
+          <div class="credits-summary-row credits-summary-total">
+            <span>Total</span>
+            <span id="creditsTotalPrice">Rp 10.000</span>
+          </div>
+        </div>
+
+        <button class="credits-panel-buy" id="creditsPanelBuy">
+          <i class="fas fa-bolt"></i>
+          Beli Sekarang
+        </button>
+
+        <div class="credits-panel-note">
+          Pembayaran diproses manual oleh admin. Kredit ditambahkan setelah disetujui.
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content Area -->
     <main class="dashboard-main">
 

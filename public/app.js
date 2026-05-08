@@ -626,6 +626,116 @@
     }
   }
 
+
+
+  // ─── Credits Slide Panel ──────────────────────────────────────────────────
+  (function() {
+    var CREDIT_PRICE = 1000; // will be updated from settings
+    var panel = document.getElementById('creditsPanel');
+    var overlay = document.getElementById('creditsPanelOverlay');
+    var closeBtn = document.getElementById('creditsPanelClose');
+    var slider = document.getElementById('creditsSlider');
+    var input = document.getElementById('creditsInput');
+    var minusBtn = document.getElementById('creditsMinus');
+    var plusBtn = document.getElementById('creditsPlus');
+    var priceEach = document.getElementById('creditsPriceEach');
+    var totalPrice = document.getElementById('creditsTotalPrice');
+    var buyBtn = document.getElementById('creditsPanelBuy');
+    var balanceEl = document.getElementById('creditsPanelBalance');
+    var presets = document.querySelectorAll('.credits-preset');
+
+    function updateSummary() {
+      var val = parseInt(input.value, 10) || 1;
+      val = Math.max(1, Math.min(100, val));
+      slider.value = val;
+      input.value = val;
+      priceEach.textContent = formatRupiah(CREDIT_PRICE);
+      totalPrice.textContent = formatRupiah(val * CREDIT_PRICE);
+      presets.forEach(function(btn) {
+        btn.classList.toggle('active', parseInt(btn.dataset.amount, 10) === val);
+      });
+    }
+
+    function setAmount(val) {
+      val = Math.max(1, Math.min(100, parseInt(val, 10) || 1));
+      input.value = val;
+      slider.value = val;
+      updateSummary();
+    }
+
+    function openPanel() {
+      loadCredits().then(function() {
+        if (balanceEl) balanceEl.textContent = credits;
+        // Fetch latest credit price
+        api('GET', '/api/settings').then(function(s) {
+          if (s && s.creditPrice) CREDIT_PRICE = s.creditPrice;
+          updateSummary();
+        }).catch(function() { updateSummary(); });
+      });
+      panel.classList.add('open');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePanel() {
+      panel.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Sync slider <-> input
+    slider.addEventListener('input', function() { setAmount(slider.value); });
+    input.addEventListener('input', function() { setAmount(input.value); });
+    minusBtn.addEventListener('click', function() { setAmount(parseInt(input.value, 10) - 1); });
+    plusBtn.addEventListener('click', function() { setAmount(parseInt(input.value, 10) + 1); });
+
+    // Preset buttons
+    presets.forEach(function(btn) {
+      btn.addEventListener('click', function() { setAmount(btn.dataset.amount); });
+    });
+
+    // Buy button
+    buyBtn.addEventListener('click', async function() {
+      var amount = parseInt(input.value, 10);
+      if (!amount || amount < 1) return showToast('Jumlah kredit minimal 1', 'error');
+      buyBtn.disabled = true;
+      buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      try {
+        var data = await api('POST', '/api/credits/buy', { amount: amount });
+        showToast('Pembayaran dibuat! Menunggu persetujuan admin.', 'success');
+        closePanel();
+        loadCredits();
+      } catch (e) {
+        showToast(e.message, 'error');
+      } finally {
+        buyBtn.disabled = false;
+        buyBtn.innerHTML = '<i class="fas fa-bolt"></i> Beli Sekarang';
+      }
+    });
+
+    // Close panel
+    closeBtn.addEventListener('click', closePanel);
+    overlay.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+    });
+
+    // Open panel from topbar credits badge
+    var topbarCredits = document.getElementById('topbarCredits');
+    if (topbarCredits) {
+      topbarCredits.style.cursor = 'pointer';
+      topbarCredits.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openPanel();
+      });
+    }
+
+    // Initialize
+    updateSummary();
+  })();
+
+
   // ─── Inbox ───────────────────────────────────────────────────────────────────
 
   async function loadInbox() {
@@ -1130,14 +1240,7 @@
       });
     }
 
-    // Topbar credits badge → go to plan view
-    var topbarCredits = document.getElementById('topbarCredits');
-    if (topbarCredits) {
-      topbarCredits.style.cursor = 'pointer';
-      topbarCredits.addEventListener('click', function() {
-        showView('plan');
-      });
-    }
+    // Topbar credits badge → handled by Credits Slide Panel (see above)
 
     // Quick action: "Buat Email Baru" button on dashboard
     var btnQuickNew = document.getElementById('btnQuickNewMailbox');
