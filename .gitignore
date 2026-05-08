@@ -6,3 +6,7 @@ npm-debug.log*
 public-backup-*/
 src-backup-*/
 *.monolith.bak
+
+# Backup outputs
+deploy/*.tar.gz
+.env
